@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Header } from '../components/Header'
+import { Button } from '../components/Button'
 
 function Login() {
     const [userName, setUserName] = useState("");
@@ -13,7 +14,7 @@ function Login() {
         <div className='login'>
             <h2>Sign in</h2>
 
-            <div style={{display: 'block', textAlign: 'center'}}>
+            <div className="center">
                 <div style={{display: 'inline-block'}}>
                     <p className='login-text'>Username:</p>
                     <input 
@@ -31,7 +32,20 @@ function Login() {
                         onChange={(event) => updateValue(event, setPassword)}
                     />
                 </div>
-                
+            </div>
+
+            <div className='center' style={{marginTop: '15px'}}>
+                <Button
+                    label="Login"
+                    clickFunc={() => {}}
+                    style="yellow"
+                />
+                &emsp;
+                <Button
+                    label="Create User"
+                    clickFunc={() => {}}
+                    style="yellow"
+                />
             </div>
         </div>
     );
