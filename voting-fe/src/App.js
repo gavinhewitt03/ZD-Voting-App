@@ -1,6 +1,6 @@
 import './App.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { Login } from './pages/Login'
+import { LoginPage } from './pages/LoginPage'
 import { User } from './pages/User'
 import { Regent } from './pages/Regent'
 import { Standards } from './pages/Standards'
@@ -26,7 +26,7 @@ function App() {
     return (
         <Router>
             <Routes>
-                <Route path="/" element={ <Login /> } />
+                <Route path="/" element={ <LoginPage /> } />
                 <Route path="/users" element={ <User /> } />
                 <Route path="/home" element = { content } />
             </Routes>

@@ -12,44 +12,92 @@ code {
     monospace;
 }
 
+html {
+    background-color: #EDEAB5;
+}
+
 h1 {
-  color: #FC3;
-  text-align: center;
-  font-size: 28pt;
-  font-style: normal;
+    color: #FC3;
+    text-align: center;
+    font-size: 28pt;
+    font-style: normal;
 }
 
 h2 {
-  color: #FC3;
-  text-align: center;
-  font-size: 28pt;
-  font-style: normal;
-  text-decoration-line: underline;
+    color: #FC3;
+    text-align: center;
+    font-size: 24pt;
+    font-style: normal;
+    padding: 15px;
+}
+
+h3 {
+    color: #FC3;
+    text-align: center;
+    font-size: 18pt;
+    font-style: normal;
+    text-decoration-line: underline;
 }
 
 p {
-  color: #8B0000;
-  text-align: center;
-  font-size: 20pt;
-  font-style: normal;
+    color: #8B0000;
+    text-align: center;
+    font-size: 14pt;
+    font-style: normal;
+    margin: 0pt;
 }
 
 button {
-  display: flex;
-  width: 170px;
-  height: 38px;
-  align-items: center;
-  justify-content: center;
-  border: black;
-  background: #8B0000;
+    display: flex;
+    width: 170px;
+    height: 38px;
+    align-items: center;
+    justify-content: center;
+    border: black;
+    background: #8B0000;
+}
+
+input {
+    background-color: #EDEAB5;
+    margin-top: 4px;
+    margin-bottom: 8px;
+    height: 35px;
+    width: 400px;
+    border: #8B0000;
+    border-radius: 5pt;
+    padding: 8px;
+    -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+    -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+    box-sizing: border-box;         /* Opera/IE 8+ */
+    color: #8B0000;
 }
 
 .navbar {
-  background-color: #8B0000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 72px;
-  top: 0px;
+    background-color: #8B0000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 72px;
+    top: 0px;
+}
+
+.login {
+    background-color: #8B0000;
+    display: block;
+    margin: auto;
+    margin-top: calc(8vh);
+    justify-content: center;
+    align-items: center;
+    width: calc(750px + 8vw);
+    height: calc(500px + 3vh);
+    border-radius: 10px;
+}
+
+.login-text {
+    color: #FC3;
+    margin: 0px;
+    font-size: 13pt;
+    font-weight: bold;
+    text-align: left;
 }
