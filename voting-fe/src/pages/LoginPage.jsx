@@ -10,6 +10,14 @@ function Login() {
         updateFunc(event.target.value);
     };
 
+    const login = async () => {
+        try {
+            const response = await fetch();
+        } catch (error) {
+
+        }
+    }
+
     return(
         <div className='login'>
             <h2>Sign in</h2>

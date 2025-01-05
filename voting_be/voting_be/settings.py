@@ -42,6 +42,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "rest_framework",
+    "rest_framework.authtoken",
+    "user"
 ]
 
 MIDDLEWARE = [
@@ -88,6 +91,8 @@ DATABASES = {
         "PORT": os.getenv("DB_PORT", "")
     }
 }
+
+AUTH_USER_MODEL = "user.User"
 
 
 # Password validation
