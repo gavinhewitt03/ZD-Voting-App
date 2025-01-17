@@ -4,17 +4,17 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.authtoken.models import Token
 from .serializers import UserSerializer
-from .models import User
+from .models import CustomUser
 
-# Create your views here.
+# get_full_name() in user model
 
 @api_view(['POST'])
 def login(request):
-    username = request.data['username']
+    email = request.data['email']
     password = request.data['password']
 
     # authenticate user
-    user = get_object_or_404(User, username=username)
+    user = get_object_or_404(CustomUser, email=email)
     if not user.check_password(password):
         return Response("Invalid password.", status=status.HTTP_401_UNAUTHORIZED)
     
@@ -36,11 +36,12 @@ def signup(request):
     if serializer.is_valid():
         serializer.save()
 
-        user = User.objects.get(username=request.data['username'])
+        user = CustomUser.objects.get(email=request.data['email'])
         user.set_password(request.data['password']) # ensure password is set to real password and not hashed one
+        user.first_name = request.data['first_name']
+        user.last_name = request.data['last_name']
         user.save()
 
-        # TODO: delete creating token ?? and set active to false so user cannot login & vote until administrator approves them. keeping for now for testing purposes
         token = Token.objects.create(user=user)
         if token:
             return Response({'token': token.key, 'user': serializer.data}, status=status.HTTP_201_CREATED)

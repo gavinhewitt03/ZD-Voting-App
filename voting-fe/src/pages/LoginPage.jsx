@@ -1,20 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 import { Header } from '../components/Header'
 import { Button } from '../components/Button'
+import { Link } from 'react-router-dom'
 
 function Login() {
-    const [userName, setUserName] = useState("");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const updateValue = (event, updateFunc) => {
-        updateFunc(event.target.value);
-    };
-
     const login = async () => {
-        try {
-            const response = await fetch();
-        } catch (error) {
+        let user = {
+            'email': email,
+            'password': password
+        }
 
+        try {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/user/login/`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(user)
+            });
+
+            console.log(response.json());
+        } catch (error) {
+            console.log(error);
         }
     }
 
@@ -24,11 +35,11 @@ function Login() {
 
             <div className="center">
                 <div style={{display: 'inline-block'}}>
-                    <p className='login-text'>Username:</p>
+                    <p className='login-text'>Email:</p>
                     <input 
                         type="text"
-                        value={userName}
-                        onChange={(event) => updateValue(event, setUserName)}
+                        value={email}
+                        onChange={(event) => setEmail(event.target.value)}
                     />
                 </div>
                 <br />
@@ -37,23 +48,27 @@ function Login() {
                     <input
                         type="password"
                         value={password}
-                        onChange={(event) => updateValue(event, setPassword)}
+                        onChange={(event) => setPassword(event.target.value)}
                     />
                 </div>
             </div>
 
             <div className='center' style={{marginTop: '15px'}}>
-                <Button
-                    label="Login"
-                    clickFunc={() => {}}
-                    style="yellow"
-                />
+                <Link to="/home">
+                    <Button
+                        label="Login"
+                        clickFunc={() => { login() }}
+                        className="yellow"
+                    />
+                </Link>
                 &emsp;
-                <Button
-                    label="Create User"
-                    clickFunc={() => {}}
-                    style="yellow"
-                />
+                <Link to="/createuser">
+                    <Button
+                        label="Create User"
+                        clickFunc={() => {}}
+                        className="yellow"
+                    />
+                </Link>
             </div>
         </div>
     );

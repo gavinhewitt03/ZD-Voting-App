@@ -1,6 +1,12 @@
+:root {
+    --dark-red: #7c0000;
+    --gold: #FC3;
+    --white: #f6f5f1
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: -apple-system, BlinkMacSystemFont, 'Tahoma', 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -13,18 +19,26 @@ code {
 }
 
 html {
-    background-color: #EDEAB5;
+    background-color: var(--white);
 }
 
 h1 {
-    color: #FC3;
+    color: var(--gold);
     text-align: center;
     font-size: 28pt;
     font-style: normal;
 }
 
 h2 {
-    color: #FC3;
+    color: var(--gold);
+    text-align: center;
+    font-size: 24pt;
+    font-style: normal;
+    padding: 15px;
+}
+
+h2.red {
+    color: var(--dark-red);
     text-align: center;
     font-size: 24pt;
     font-style: normal;
@@ -32,34 +46,57 @@ h2 {
 }
 
 h3 {
-    color: #FC3;
+    color: var(--gold);
     text-align: center;
     font-size: 18pt;
     font-style: normal;
     text-decoration-line: underline;
+    padding-top: 8px;
+    margin: 15px;
 }
 
-p {
-    color: #8B0000;
+h3.red {
+    color: var(--dark-red);
+    text-align: center;
+    font-size: 18pt;
+    font-style: normal;
+    text-decoration-line: underline;
+    padding-top: 8px;
+    margin: 15px;
+}
+
+p.red {
+    color: var(--dark-red);
     text-align: center;
     font-size: 14pt;
     font-style: normal;
     margin: 0pt;
 }
 
+p.yellow {
+    color: var(--gold);
+    text-align: center;
+    font-size: 14pt;
+    font-style: normal;
+    margin: 0pt;
+    font-weight: bold;
+    padding: 1px;
+}
+
 input {
-    background-color: #EDEAB5;
+    background-color: var(--white);
     margin-top: 6px;
     margin-bottom: 20px;
     height: 35px;
     width: 400px;
-    border: #8B0000;
+    border-color: var(--dark-red);
     border-radius: 5pt;
+    border-style: solid;
+    border-width: 2px;
     padding: 8px;
     -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
     -moz-box-sizing: border-box;    /* Firefox, other Gecko */
     box-sizing: border-box;         /* Opera/IE 8+ */
-    color: #8B0000;
 }
 
 .center {
@@ -68,10 +105,11 @@ input {
     align-items: center;
 }
 
-.navbar {
-    background-color: #8B0000;
+.header {
+    background-color: #7c0000;
     display: flex;
     justify-content: center;
+    text-align: center;
     align-items: center;
     width: 100%;
     height: 72px;
@@ -79,19 +117,20 @@ input {
 }
 
 .login {
-    background-color: #8B0000;
+    background-color: var(--dark-red);
     display: block;
     margin: auto;
     margin-top: calc(8vh);
     justify-content: center;
     align-items: center;
+    text-align: center;
     width: calc(750px + 8vw);
     height: calc(500px + 3vh);
     border-radius: 10px;
 }
 
 .login-text {
-    color: #FC3;
+    color: var(--gold);
     margin: 0px;
     font-size: 13pt;
     font-weight: bold;
@@ -101,14 +140,15 @@ input {
 .red-button {
     display: inline-block;
     margin: auto;
-    width: 135px;
-    height: 32px;
+    width: 150px;
+    height: 40px;
     align-items: center;
     justify-content: center;
     border: black;
     border-radius: 5pt;
-    background: #8B0000;
+    background: var(--dark-red);
     color: white;
+    font-size: 12pt;
 }
 
 .yellow-button {
@@ -120,5 +160,106 @@ input {
     justify-content: center;
     border: black;
     border-radius: 5pt;
-    background: #FC3;
+    background: var(--gold)
+}
+
+button.red-button:active {
+    background: #7c0000eb;
+    -webkit-box-shadow: inset 0px 0px 5px #a1a1a1;
+       -moz-box-shadow: inset 0px 0px 5px #a1a1a1;
+            box-shadow: inset 0px 0px 5px #a1a1a1;
+     outline: none;
+     transform: scale(0.97);
+}
+
+button.red-button:active {
+    background: #7c0000ab;
+    transition: 0.4s ease;
+    -webkit-box-shadow: inset 0px 0px 5px #c1c1c1;
+       -moz-box-shadow: inset 0px 0px 5px #c1c1c1;
+            box-shadow: inset 0px 0px 5px #c1c1c1;
+     outline: none;
+}
+
+button.yellow-button:active {
+    background: rgba(255, 204, 51, 0.4);
+    -webkit-box-shadow: inset 0px 0px 5px #a1a1a1;
+       -moz-box-shadow: inset 0px 0px 5px #a1a1a1;
+            box-shadow: inset 0px 0px 5px #a1a1a1;
+     outline: none;
+     transform: scale(0.97);
+}
+
+button.yellow-button:hover {
+    background: rgba(255, 204, 51, 0.9);
+    transition: 0.4s ease;
+    -webkit-box-shadow: inset 0px 0px 5px #c1c1c1;
+       -moz-box-shadow: inset 0px 0px 5px #c1c1c1;
+            box-shadow: inset 0px 0px 5px #c1c1c1;
+     outline: none;
+}
+
+.remaining-votes-standards {
+    background-color:var(--dark-red);
+    margin-top: 2vh;
+    margin-bottom: 2vh;
+    margin-left: 1vw;
+    width: 300px;
+    height: calc(96vh - 72px);
+    border-radius: 5pt;
+}
+
+.remaining-votes-regent {
+    background-color:var(--dark-red);
+    margin-top: 2vh;
+    margin-bottom: 2vh;
+    margin: auto;
+    width: 300px;
+    height: calc(96vh - 72px);
+    border-radius: 5pt;
+}
+
+.poll-section {
+    margin: auto;
+    width: calc(100vw - 300px);
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    display: block;
+    text-align: center;
+}
+
+table.user-table {
+    margin: auto;
+    width: 85vw;
+    height: auto;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background-color: var(--dark-red);
+    border-radius: 10px;
+    border-collapse: collapse;
+}
+
+td {
+    border-color: var(--white);
+    border-style: solid;
+    border-width: 1pt;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.flex-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    height: 100%;
+}
+
+p.user-table-text {
+    font-size: 14pt;
+    color: var(--gold);
+    font-weight: bold;
 }
