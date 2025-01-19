@@ -1,17 +1,25 @@
 import React, { useState } from 'react'
 import { Header } from '../components/Header'
 import { Button } from '../components/Button'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { InputField } from '../components/InputField'
 
-function Login() {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+function Login({ setUserGroups }) {
+    const [formData, setFormData] = useState({
+        'email':'',
+        'password':''
+    });
+    const [isLoading, setIsLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState(null);
+    const navigate = useNavigate();
 
-    const login = async () => {
-        let user = {
-            'email': email,
-            'password': password
-        }
+    const login = async (event) => {
+        event.preventDefault();
+
+        if (isLoading)
+            return;
+
+        setIsLoading(true);
 
         try {
             const response = await fetch(`${process.env.REACT_APP_API_URL}/user/login/`, {
@@ -20,65 +28,99 @@ function Login() {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(user)
+                body: JSON.stringify({
+                    'email': formData['email'],
+                    'password': formData['password']
+                })
             });
 
-            console.log(response.json());
+            const data = await response.json();
+            if (response.ok) {
+                setUserGroups(data['groups']);
+                localStorage.setItem('accessToken', data['tokens']['access']);
+                localStorage.setItem('refreshToken', data['tokens']['refresh']);
+                navigate('/home');
+            } else {
+                setErrorMessage(data['non_field_errors'][0]);
+            }
+
         } catch (error) {
             console.log(error);
+        } finally {
+            setIsLoading(false);
         }
+    }
+
+    const handleChange = (event) => {
+        setFormData({
+            ...formData,
+            [event.target.name]: event.target.value
+        });
     }
 
     return(
         <div className='login'>
-            <h2>Sign in</h2>
+            <form>
+                <h2 style={{margin: '2vh'}}>
+                    Sign in
+                </h2>
 
-            <div className="center">
-                <div style={{display: 'inline-block'}}>
-                    <p className='login-text'>Email:</p>
-                    <input 
-                        type="text"
-                        value={email}
-                        onChange={(event) => setEmail(event.target.value)}
-                    />
-                </div>
-                <br />
-                <div style={{display: 'inline-block'}}>
-                    <p className='login-text'>Password:</p>
-                    <input
+                { errorMessage && 
+                    <>
+                        <p className='yellow'>
+                            {errorMessage}
+                        </p>
+                        <br />
+                    </>
+                }
+
+                <div className="center">
+                    <InputField
+                        text="Email"
+                        stateVar={formData.email}
+                        stateFunc={handleChange}
+                        name="email"
+                    /> 
+                    <br />
+                    <InputField
+                        text="Password"
+                        stateVar={formData.password}
+                        stateFunc={handleChange}
+                        name="password"
                         type="password"
-                        value={password}
-                        onChange={(event) => setPassword(event.target.value)}
-                    />
+                    /> 
                 </div>
-            </div>
 
-            <div className='center' style={{marginTop: '15px'}}>
-                <Link to="/home">
+                <div className='center' style={{marginTop: '15px'}}>
                     <Button
                         label="Login"
-                        clickFunc={() => { login() }}
+                        clickFunc={login}
                         className="yellow"
+                        type="submit"
+                        disabled={isLoading}
                     />
-                </Link>
-                &emsp;
-                <Link to="/createuser">
-                    <Button
-                        label="Create User"
-                        clickFunc={() => {}}
-                        className="yellow"
-                    />
-                </Link>
-            </div>
+                    &emsp;
+                    <Link to="/createuser">
+                        <Button
+                            label="Create User"
+                            clickFunc={() => {}}
+                            className="yellow"
+                        />
+                    </Link>
+                </div>
+            </form>
+            
         </div>
     );
 }
 
-export function LoginPage() {
+export function LoginPage({ setUserGroups }) {
     return(
         <>
             <Header />
-            <Login />
+            <Login 
+                setUserGroups={setUserGroups}
+            />
         </>
     );
 }

@@ -31,8 +31,16 @@ SECRET_KEY = os.getenv("SECRET_KEY", "")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", False) == "True"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1'
+]
 
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000'
+]
+
+CORS_ALLOW_CREDENTIALS = True
 
 # Application definition
 
@@ -53,6 +61,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    'corsheaders.middleware.CorsMiddleware',
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -98,7 +107,8 @@ DATABASES = {
 AUTH_USER_MODEL = "user.CustomUser"
 
 AUTHENTICATION_BACKENDS = [
-    "user.authentication.CustomUserAuthentication"
+    "user.authentication.CustomUserAuthentication",
+    'django.contrib.auth.backends.ModelBackend'
 ]
 
 # Password validation

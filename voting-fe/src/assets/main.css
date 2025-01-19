@@ -34,7 +34,8 @@ h2 {
     text-align: center;
     font-size: 24pt;
     font-style: normal;
-    padding: 15px;
+    padding: 0px;
+    margin: 0px;
 }
 
 h2.red {
@@ -125,8 +126,10 @@ input {
     align-items: center;
     text-align: center;
     width: calc(750px + 8vw);
-    height: calc(500px + 3vh);
+    min-height: calc(500px + 3vh);
+    height: calc(auto + 2vh);
     border-radius: 10px;
+    padding: 2vh;
 }
 
 .login-text {
@@ -262,4 +265,10 @@ p.user-table-text {
     font-size: 14pt;
     color: var(--gold);
     font-weight: bold;
+}
+
+.right-align {
+    position: absolute;
+    right: 1vw;
+    z-index: 10;
 }

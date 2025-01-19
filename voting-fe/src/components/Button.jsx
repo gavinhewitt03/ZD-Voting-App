@@ -6,13 +6,20 @@ function classSelector(className) {
     }
 }
 
-export function Button({ label, clickFunc, className }) {
+export function Button({ label, clickFunc, className, type, disabled }) {
     return(
         <button
             onClick={ clickFunc }
             className={ classSelector(className) }
+            type={type}
+            disabled={disabled}
         >
             {label}
         </button>
     );
+}
+
+Button.defaultProps = {
+    type: 'button',
+    disabled: false
 }

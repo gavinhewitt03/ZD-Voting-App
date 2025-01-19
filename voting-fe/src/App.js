@@ -5,31 +5,33 @@ import { User } from './pages/User'
 import { Regent } from './pages/Regent'
 import { Standards } from './pages/Standards'
 import { Poll } from './pages/Poll'
-import { CreateUser } from './pages/CreateUser';
-
-let content;
-
-let user = {
-    "name": "Gavin",
-    "groups": ["Admin"]
-};
-
-let groups = user["groups"];
-
-if (groups.includes("Standards"))
-    content = <Standards />
-else if (groups.includes("Regent"))
-    content = <Regent />
-else if (groups.includes("Admin"))
-    content = <User />
-else
-    content = <Poll />
+import { CreateUser } from './pages/CreateUser'
+import React, { useState, useEffect } from 'react'
 
 function App() {
+    const [userGroups, setUserGroups] = useState([]);
+    const [content, setContent] = useState(null);
+    
+    useEffect(() => {
+        if (userGroups.includes("Standards"))
+            setContent(<Standards />);
+        else if (userGroups.includes("Regent"))
+            setContent(<Regent />);
+        else if (userGroups.includes("Administrator"))
+            setContent(<User />);
+        else
+            setContent(<Poll />);
+        
+    }, [userGroups]);
+
     return (
         <Router>
             <Routes>
-                <Route path="/" element={ <LoginPage /> } />
+                <Route path="/" element={ 
+                    <LoginPage 
+                        setUserGroups={setUserGroups}
+                    /> 
+                } />
                 <Route path="/users" element={ <User /> } />
                 <Route path="/home" element = { content } />
                 <Route path="/createuser" element={ <CreateUser /> } />

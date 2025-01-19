@@ -1,72 +1,132 @@
 import React, { useState } from 'react'
 import { Button } from '../components/Button'
 import { Header } from '../components/Header'
-import { Link } from 'react-router-dom'
-
-function InputField(text, stateVar, stateFunc) {
-    return (
-        <div style={{display: 'inline-block'}}>
-            <p className="login-text">
-                {text}
-            </p>
-            <input
-                type="text"
-                value={stateVar}
-                onChange={(event) => stateFunc(event.target.value)}
-            />
-        </div>
-    )
-}
+import { Link, useNavigate } from 'react-router-dom'
+import { InputField } from '../components/InputField';
 
 export function CreateUser() {
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const [formData, setFormData] = useState({
+       'first_name': '',
+       'last_name': '',
+       'email': '',
+       'password1': '',
+       'password2': ''
+    });
+    const [errorMessage, setErrorMessage] = useState(null);
+    const navigate = useNavigate();
 
-    const createUser = async () => {
-        let user = {
-            'first_name': firstName,
-            'last_name': lastName,
-            'email': email,
-            'password': password
+    const handleChange = (event) => {
+        setFormData({
+            ...formData,
+            [event.target.name]:[event.target.value]
+        });
+    };
+
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+
+        if (isLoading)
+            return;
+
+        setIsLoading(true);
+
+        try {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/user/register/`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    'first_name': formData['first_name'][0],
+                    'last_name': formData['last_name'][0],
+                    'email': formData['email'][0],
+                    'password1': formData['password1'][0],
+                    'password2': formData['password2'][0]
+                })
+            });
+
+            console.log("response: " + response.data);
+            setErrorMessage(response.data);
+            navigate('/');
+        } catch (error) {
+            setErrorMessage(error);
+        } finally {
+            setIsLoading(false);
         }
-    }
+    };
 
     return (
         <>
             <Header />
             <div className="login">
-                <h2> Create User </h2>
+                <form>
+                    <h2> Create User </h2>
+                    {errorMessage && 
+                        <p className="login-text">
+                            {errorMessage}
+                        </p>
+                    }
+                    <InputField
+                        text="First Name:"
+                        stateVar={formData.first_name}
+                        stateFunc={handleChange}
+                        name="first_name"
+                    /> 
+                    <br />
+                    <InputField
+                        text="Last Name:"
+                        stateVar={formData.last_name}
+                        stateFunc={handleChange}
+                        name="last_name"
+                    />
+                    <br />
+                    <InputField
+                        text="Email:"
+                        stateVar={formData.email}
+                        stateFunc={handleChange}
+                        name="email"
+                    /> 
+                    <br />
+                    <InputField
+                        text="Password:"
+                        stateVar={formData.password1}
+                        stateFunc={handleChange}
+                        name="password1"
+                        type="password"
+                    /> 
+                    <br />
+                    <InputField
+                        text="Confirm Password"
+                        stateVar={formData.password2}
+                        stateFunc={handleChange}
+                        name="password2"
+                        type="password"
+                    /> 
 
-                { InputField("First Name:", firstName, setFirstName) }
-                <br />
-                { InputField("Last Name:", lastName, setLastName) }
-                <br />
-                { InputField("Email:", email, setEmail) }
-                <br />
-                { InputField("Password:", password, setPassword) }
-
-                <div style={{marginTop: '15px'}}>
-                    <Link to="/home">
-                        <Button
-                            label="Create User"
-                            clickFunc={() => {}}
-                            className="yellow"
-                        />
-                    </Link>
-                    &emsp;
-                    <Link to="/">
-                        <Button
-                            label="Cancel"
-                            clickFunc={() => {}}
-                            className="yellow"
-                        />
-                    </Link>
-                </div>
+                    <div style={{marginTop: '15px', marginBottom: '15px'}}>
+                        <Link to="/">
+                            <Button
+                                label="Create User"
+                                clickFunc={handleSubmit}
+                                className="yellow"
+                                type="submit"
+                                disabled={isLoading}
+                            />
+                        </Link>
+                        &emsp;
+                        <Link to="/">
+                            <Button
+                                label="Cancel"
+                                clickFunc={() => {}}
+                                className="yellow"
+                            />
+                        </Link>
+                    </div>
+                </form>    
             </div>
-
-            
         </>
     )
 }

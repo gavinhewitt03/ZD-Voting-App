@@ -1,11 +1,13 @@
 from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.authtoken.models import Token
-from rest_framework.generics import GenericAPIView
+from rest_framework.generics import GenericAPIView, RetrieveAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.exceptions import ValidationError
 from .serializers import *
 from .models import CustomUser
 
@@ -15,7 +17,10 @@ class UserRegistrationAPIView(GenericAPIView):
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        try:
+            serializer.is_valid(raise_exception=True)
+        except ValidationError as e:
+            return Response({'error': e.detail}, status=status.HTTP_400_BAD_REQUEST)
         user = serializer.save()
 
         token = RefreshToken.for_user(user)
@@ -54,14 +59,38 @@ class LogoutAPIView(GenericAPIView):
             return Response(status=status.HTTP_204_NO_CONTENT)
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+        
+class UserInfoAPIView(RetrieveAPIView):
+    permission_classes = (IsAuthenticated, )
+    serializer_class = UserSerializer
+
+    def get_object(self):
+        return self.request.user
 
 @api_view(['GET'])
 def get_all_users(request):
-    users = CustomUser.objects.all()
+    User = get_user_model()
 
-    serializer = UserSerializer(data=users)
+    users = User.objects.all()
 
-    return Response(serializer.data)
+    serializer = UserSerializer(users, many=True)
+
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def update_is_active(request):
+    email = request.data['email']
+    user = CustomUser.objects.get(email=email)
+
+    user.is_active = not user.is_active
+
+    serializer = UserSerializer(user, data={'is_active': user.is_active}, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['GET'])
 def get_all_logged_in(request):
