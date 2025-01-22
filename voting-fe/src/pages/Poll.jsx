@@ -1,70 +1,236 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Button } from '../components/Button'
 import { Header } from '../components/Header'
-
-async function SendVote(vote) {
-    let data;
-    if (vote)
-        data = { 'vote': 'yes' };
-    else
-        data = { 'vote': 'no' };
-
-    // const response = await fetch(`${process.env.REACT_APP_API_URL}/poll/vote`, {
-    //     method: 'POST',
-    //     headers: {
-    //         'Accept': 'application/json',
-    //         'Content-Type': 'application/json'
-    //     },
-    //     body: JSON.stringify(data)
-    // });
-}
-
-function GetRusheeName() {
-    // GET request to backend for rusheeName
-    // how to get this to run continuously... idk
-}
+import { w3cwebsocket as W3CWebSocket } from 'websocket'
 
 // rusheeName use effect would function as follows (I think): once rusheeName changes via request, set activePoll according to it being "" or an actual name
 
-function SetContent() {
-    const [rusheeName, setRusheeName] = useState("");
-    let activePoll = true; 
+export function Poll() {
+    const [loggedIn, setLoggedIn] = useState(false);
+    const navigate = useNavigate();
 
-    if (activePoll) {
+    const [content, setContent] = useState("NoSession");
+    const [rusheeName, setRusheeName] = useState("");
+
+    const [sessionID, setSessionID] = useState("");
+    const [sessionInput, setSessionInput] = useState("");
+
+    let user_email;
+    let user_full_name;
+    useEffect(() => {
+        const authenticate = async () => {
+            try {
+                const token = localStorage.getItem('accessToken');
+
+                if (token) {
+                    const config = {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    }
+                    const response = await fetch(`${process.env.REACT_APP_API_URL}/user/get_user`, config);
+                    
+                    const data = await response.json();
+                    user_email = data['email'];
+                    user_full_name = data['first_name'] + ' ' + data['last_name'];
+
+                    if (response.ok) {
+                        setLoggedIn(true);
+                    } else {
+                        navigate('/');
+                    }
+                }
+            } catch(error) {
+                console.log(error);
+            }
+        };
+
+        const hasVoted = async () => {
+            if (!rusheeName || rusheeName.length === 0)
+                return;
+
+            const params = {rushee_name: rusheeName};
+            const queryParams = new URLSearchParams(params).toString();
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/poll/voters/?${queryParams}`)
+
+            const voters = (await response.json())['voters'];
+
+            if (!voters)
+                return;
+
+            if (voters.includes(user_email))
+                setContent("ActiveVoted");
+        };
+
+        authenticate();
+        hasVoted();
+    });
+
+    const client = useRef(null);
+        useEffect(() => {
+            if (sessionID.length === 0) { // check if empty string
+                setContent("NoSession");
+                return;
+            }
+            
+            client.current = new W3CWebSocket(`${process.env.REACT_APP_WS_URL}${sessionID}/`);
+    
+            client.current.onopen = () => {
+                setContent("Active");
+                console.log('WebSocket client connected: ', `${process.env.REACT_APP_WS_URL}${sessionID}/`);
+            };
+    
+            client.current.onmessage = (message) => {
+                console.log('received message!');
+                let messageJson = JSON.parse(message['data']);
+                console.log(messageJson['message']);
+                setRusheeName(messageJson['message']['rushee_name']);
+            }
+    
+            client.current.onclose = (event) => {
+                console.log("WebSocket client disconnected: ", event.reason);
+                setContent("Inactive");
+            }
+    
+            client.current.onerror = (error) => {
+                console.error("WebSocket error: ", error);
+            }
+    
+            return () => {
+                if (client.current) {
+                    client.current.close();
+                    console.log("WebSocket connection closed via cleanup.");
+                    setContent("Inactive");
+                }
+            }
+        }, [sessionID]);
+
+    const SendVote = async (vote) => {
+        let data = {
+            'rushee_name': rusheeName,
+            'vote': vote,
+            'email': user_email
+        };
+
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/poll/vote/`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (!client.current || client.current.readyState !== WebSocket.OPEN) {
+            console.error("WebSocket not connected. Cannot send rushee name.");
+            return;
+        }
+
+        client.current.send(JSON.stringify({
+            type: 'message',
+            message: {rushee_name: rusheeName},
+            name: user_full_name
+        }));
+        console.log('voter name sent');
+
+        if (response.ok)
+            setContent("ActiveVoted");
+        else
+            setContent("VoteFailed");
+    }
+
+    const updateSession = () => {
+        setSessionID(sessionInput);
+        setSessionInput("");
+    }
+
+    const renderContent = () => {
+        switch(content) {
+            case "Active":
+                return (
+                    <>
+                        <div style={{ marginTop: '100px' }}>
+                            <h2 className="red"> { rusheeName } </h2>
+                        </div>
+                        <div className='center' style={{marginTop: '45px'}}>
+                            <Button
+                                label="Yes"
+                                clickFunc={ () => SendVote(true) }
+                                className="red"
+                            />
+                            &emsp;
+                            <Button
+                                label="No"
+                                clickFunc={ () => SendVote(false) }
+                                className="red"
+                            />
+                            </div>
+                    </>
+                );
+            case "ActiveVoted":
+                return (
+                    <>
+                        <div style={{ marginTop: '100px' }}>
+                            <h2 className="red"> Your vote has been recorded. </h2>
+                        </div>
+                    </>
+                );
+            case "VoteFailed":
+                return (
+                    <>
+                        <div style={{ marginTop: '100px' }}>
+                            <h2 className="red"> There was an issue recording your vote. Please logout and log back in and try again. </h2>
+                        </div>
+                    </>
+                );
+            case "NoSession":
+                return (
+                    <div className="poll-section">
+                        <h3 className="red" style={{textDecorationLine: 'none'}}>
+                            Session ID:
+                        </h3>
+                        <input 
+                            type="text" 
+                            value={sessionInput}
+                            onChange={(event) => setSessionInput(event.target.value)}
+                        />
+                        <br />
+                        <br />
+                        <Button
+                            label="Join Session"
+                            clickFunc={updateSession}
+                            className="red"
+                        />
+                    </div>
+                );
+            default:
+                return (
+                    <h2 className="red">
+                        Please wait for Standards to start the poll.
+                    </h2>
+                );
+        }
+    }
+
+    if (!loggedIn) {
         return (
             <>
-                <div style={{ marginTop: '100px' }}>
-                    <h2 className="red"> { rusheeName } </h2>
-                </div>
-                <div className='center' style={{marginTop: '45px'}}>
-                    <Button
-                        label="Yes"
-                        clickFunc={ () => SendVote(true) }
-                        className="red"
-                    />
-                    &emsp;
-                    <Button
-                        label="No"
-                        clickFunc={ () => SendVote(false) }
-                        className="red"
-                    />
-                    </div>
+                <Header />
+                <h2 className="error">
+                    You are not authorized to view this page. Redirecting to login screen.
+                </h2>
             </>
-        )
-    } else {
-        return (
-            <h2 className="red">
-                Please wait for Standards to start the poll.
-            </h2>
-        )
+        );
     }
-}
 
-export function Poll() {
     return (
         <>
-            <Header />
-            { SetContent() }
+            <Header 
+                setLoggedIn={setLoggedIn}
+                displayLogout={true}
+            />
+            { renderContent() }
         </>
     );
 }

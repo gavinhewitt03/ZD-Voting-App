@@ -14,7 +14,9 @@
     "react-router-dom": "^7.1.1",
     "react-scripts": "^5.0.1",
     "react-toggle-slider": "^0.4.1",
-    "web-vitals": "^2.1.4"
+    "react-use-websocket": "^4.11.1",
+    "web-vitals": "^2.1.4",
+    "websocket": "^1.0.35"
   },
   "scripts": {
     "start": "react-scripts start",

@@ -45,6 +45,7 @@ CORS_ALLOW_CREDENTIALS = True
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -53,9 +54,10 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "corsheaders",
     "rest_framework",
-    "rest_framework.authtoken",
-    'rest_framework_simplejwt.token_blacklist',
-    "user"
+    "rest_framework_simplejwt.token_blacklist",
+    "channels",
+    "user",
+    "poll"
 ]
 
 MIDDLEWARE = [
@@ -88,7 +90,24 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "voting_be.wsgi.application"
+ASGI_APPLICATION = "voting_be.asgi.application"
 
+# this is only for deployment OR development on MAC/LINUX.
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
+
+# if you are on windows, use this instead in development
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels.layers.InMemoryChannelLayer"
+#     }
+# }
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases

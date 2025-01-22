@@ -3,7 +3,6 @@ from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from rest_framework.authtoken.models import Token
 from rest_framework.generics import GenericAPIView, RetrieveAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -45,6 +44,24 @@ class LoginAPIView(GenericAPIView):
         data["tokens"] = {'refresh':str(token),
                           'access':str(token.access_token)}
         
+        # add user to list of logged in users
+        IGNORE_USERS = [
+            'sotheta@mailbox.sc.edu', 
+            'thetatauzdregent@gmail.com', 
+            'thetatauzdstandards@gmail.com', 
+            'thetatauzdtechnology@gmail.com'
+        ]
+        if user.email in IGNORE_USERS:
+            return Response(data=data, status=status.HTTP_200_OK)
+
+        user_full_name = user.get_full_name()
+        logged_in_serializer = LoggedInUserSerializer(data = {'full_name': user_full_name})
+
+        if logged_in_serializer.is_valid():
+            logged_in_serializer.save()
+        else:
+            print('failed to add user to logged in users')
+        
         return Response(data=data, status=status.HTTP_200_OK)
     
 class LogoutAPIView(GenericAPIView):
@@ -55,6 +72,12 @@ class LogoutAPIView(GenericAPIView):
             refresh_token = request.data["refresh"]
             token = RefreshToken(refresh_token)
             token.blacklist()
+
+            # remove user from logged in list
+            full_name = request.data["full_name"]
+            logged_in_user = get_object_or_404(LoggedInUsers, full_name=full_name)
+
+            logged_in_user.delete()
 
             return Response(status=status.HTTP_204_NO_CONTENT)
         except:

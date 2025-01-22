@@ -1,0 +1,50 @@
+<!-- poll/templates/poll/room.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>poll Room</title>
+</head>
+<body>
+    <textarea id="poll-log" cols="100" rows="20"></textarea><br>
+    <input id="poll-message-input" type="text" size="100"><br>
+    <input id="poll-message-submit" type="button" value="Send">
+    {{ room_name|json_script:"room-name" }}
+    <script>
+        const roomName = JSON.parse(document.getElementById('room-name').textContent);
+
+        const pollSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/poll/'
+            + roomName
+            + '/'
+        );
+
+        pollSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            document.querySelector('#poll-log').value += (data.message + '\n');
+        };
+
+        pollSocket.onclose = function(e) {
+            console.error('poll socket closed unexpectedly');
+        };
+
+        document.querySelector('#poll-message-input').focus();
+        document.querySelector('#poll-message-input').onkeyup = function(e) {
+            if (e.key === 'Enter') {  // enter, return
+                document.querySelector('#poll-message-submit').click();
+            }
+        };
+
+        document.querySelector('#poll-message-submit').onclick = function(e) {
+            const messageInputDom = document.querySelector('#poll-message-input');
+            const message = messageInputDom.value;
+            pollSocket.send(JSON.stringify({
+                'message': message
+            }));
+            messageInputDom.value = '';
+        };
+    </script>
+</body>
+</html>

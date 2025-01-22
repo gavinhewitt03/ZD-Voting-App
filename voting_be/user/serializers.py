@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CustomUser
+from .models import CustomUser, LoggedInUsers
 from django.contrib.auth import authenticate
 
 class UserSerializer(serializers.ModelSerializer):
@@ -49,4 +49,9 @@ class UserLoginSerializer(serializers.Serializer):
         if user:
             return user
         raise serializers.ValidationError("Incorrect email or password.")
+    
+class LoggedInUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LoggedInUsers
+        fields = ['full_name']
     

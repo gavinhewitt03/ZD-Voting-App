@@ -17,3 +17,6 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.email
+    
+class LoggedInUsers(models.Model):
+    full_name = models.CharField(max_length=150, unique=True, blank=False, null=False, verbose_name='full name')
