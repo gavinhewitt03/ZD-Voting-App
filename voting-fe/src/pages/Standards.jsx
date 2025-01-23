@@ -58,13 +58,6 @@ export function Standards() {
             console.log('WebSocket client connected: ', `${process.env.REACT_APP_WS_URL}${sessionID}/`);
         };
 
-        client.current.onmessage = (message) => {
-            let messageJson = JSON.stringify(message);
-            let voterName = messageJson['name']
-
-            // TODO: remove voter name from list of active pollers
-        }
-
         client.current.onclose = (event) => {
             console.log("WebSocket client disconnected: ", event.reason);
             setContent("Inactive");
@@ -95,7 +88,6 @@ export function Standards() {
                     <div style={{display: 'flex'}}>
                         <StandardsPoll 
                             sessionID={sessionID}
-                            setSessionID={setSessionID}
                          />
                     </div>
                 );

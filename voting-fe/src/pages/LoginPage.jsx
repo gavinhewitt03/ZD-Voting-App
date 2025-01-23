@@ -36,6 +36,18 @@ function Login({ setUserGroups }) {
 
             const data = await response.json();
             if (response.ok) {
+                // let user_name = data['first_name'] + ' ' + data['last_name'];
+                // await fetch(`${process.env.REACT_APP_API_URL}/user/add_voter/`, {
+                //     method: 'POST',
+                //     headers: {
+                //         'Accept': 'application/json',
+                //         'Content-Type': 'application/json'
+                //     },
+                //     body: JSON.stringify({
+                //         full_name: user_name
+                //     })
+                // });
+
                 setUserGroups(data['groups']);
                 localStorage.setItem('accessToken', data['tokens']['access']);
                 localStorage.setItem('refreshToken', data['tokens']['refresh']);

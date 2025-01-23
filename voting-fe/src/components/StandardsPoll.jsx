@@ -3,10 +3,11 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Button } from "./Button";
 import { w3cwebsocket as W3CWebSocket } from 'websocket'
 
-export function StandardsPoll({ sessionID, setSessionID }) {
+export function StandardsPoll({ sessionID }) {
     const [percentage, setPercentage] = useState(0.0);
     const [rusheeName, setRusheeName] = useState("");
     const [activePoll, setActivePoll] = useState(false);
+    const [remainingVoters, setRemainingVoters] = useState([]);
     
     const client = useRef(null);
     useEffect(() => {
@@ -24,10 +25,18 @@ export function StandardsPoll({ sessionID, setSessionID }) {
         };
 
         client.current.onmessage = (message) => {
-            let messageJson = JSON.stringify(message);
-            let voterName = messageJson['name']
-
-            // TODO: remove voter name from list of active pollers
+            let messageJson = JSON.parse(message['data']);
+            
+            if (messageJson['message'] === 'voted' || messageJson['message'] === 'logged out') {
+                let removeName = messageJson['name'];
+                setRemainingVoters((voters) => {
+                    if (voters.includes(removeName)) {
+                        const updatedVoters = remainingVoters.filter(voter => voter !== removeName);
+                        return updatedVoters;
+                    }
+                    return voters;
+                });
+            }
         }
 
         client.current.onclose = (event) => {
@@ -44,7 +53,7 @@ export function StandardsPoll({ sessionID, setSessionID }) {
                 console.log("WebSocket connection closed via cleanup.");
             }
         }
-    }, [sessionID]);
+    }, [sessionID, remainingVoters]);
 
     const sendRusheeName = () => {
         if (!client.current || client.current.readyState !== WebSocket.OPEN) {
@@ -57,12 +66,11 @@ export function StandardsPoll({ sessionID, setSessionID }) {
             message: {rushee_name: rusheeName},
             name: 'standards'
         }));
-        console.log('rushee name sent');
     }
 
     const startPoll = async () => {
         sendRusheeName();
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/poll/create/`, {
+        const postResponse = await fetch(`${process.env.REACT_APP_API_URL}/poll/create/`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -75,6 +83,23 @@ export function StandardsPoll({ sessionID, setSessionID }) {
                 voters: []
             })
         });
+
+        client.current.send(JSON.stringify({
+            type: 'message',
+            message: 'get_logged_in',
+            name: 'for_regent'
+        }));
+
+        const getResponse = await fetch(`${process.env.REACT_APP_API_URL}/user/get_logged_in/`);
+        const getData = await getResponse.json();
+        
+        let voters = [];
+        getData.forEach((jsonVoter, i) => {
+            voters.push(jsonVoter['full_name'])
+        });
+
+        setRemainingVoters(voters);
+
         setActivePoll(true);
     }
 
@@ -101,6 +126,13 @@ export function StandardsPoll({ sessionID, setSessionID }) {
                 rushee_name: rusheeName
             })
         })
+
+        client.current.send(JSON.stringify({
+            type: 'message',
+            message: {rushee_name: ""},
+            name: 'standards'
+        }));
+
         setActivePoll(false);
     }
 
@@ -108,7 +140,7 @@ export function StandardsPoll({ sessionID, setSessionID }) {
         return (
             <>
                 <RemainingVotes
-                    remainingVoters={[]}
+                    remainingVoters={remainingVoters}
                     className="remaining-votes-standards"
                 />
                 <div className="poll-section">

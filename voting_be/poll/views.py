@@ -43,6 +43,10 @@ def get_percentage(request):
     rushee_stats = get_object_or_404(Poll, rushee_name=rushee_name)
 
     total_votes = rushee_stats.yes_votes + rushee_stats.no_votes
+
+    if total_votes == 0:
+        return Response({"percentage": f"{0:.2f}"}, status=status.HTTP_200_OK)
+    
     percentage = rushee_stats.yes_votes / total_votes
 
     return Response({"percentage": f"{percentage*100:.2f}"}, status=status.HTTP_200_OK)

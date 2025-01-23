@@ -114,10 +114,13 @@ def update_is_active(request):
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 @api_view(['GET'])
 def get_all_logged_in(request):
-    pass
+    logged_in_users = LoggedInUsers.objects.all()
+
+    serializer = LoggedInUserSerializer(logged_in_users, many=True)
+
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def get_full_name(request):

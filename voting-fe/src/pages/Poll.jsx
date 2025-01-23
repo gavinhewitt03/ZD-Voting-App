@@ -16,8 +16,8 @@ export function Poll() {
     const [sessionID, setSessionID] = useState("");
     const [sessionInput, setSessionInput] = useState("");
 
-    let user_email;
-    let user_full_name;
+    const user_email = useRef(null);
+    const user_full_name = useRef(null);
     useEffect(() => {
         const authenticate = async () => {
             try {
@@ -32,8 +32,8 @@ export function Poll() {
                     const response = await fetch(`${process.env.REACT_APP_API_URL}/user/get_user`, config);
                     
                     const data = await response.json();
-                    user_email = data['email'];
-                    user_full_name = data['first_name'] + ' ' + data['last_name'];
+                    user_email.current = data['email'];
+                    user_full_name.current = data['first_name'] + ' ' + data['last_name'];
 
                     if (response.ok) {
                         setLoggedIn(true);
@@ -46,6 +46,10 @@ export function Poll() {
             }
         };
 
+        authenticate();
+    });
+
+    useEffect(() => {
         const hasVoted = async () => {
             if (!rusheeName || rusheeName.length === 0)
                 return;
@@ -63,54 +67,66 @@ export function Poll() {
                 setContent("ActiveVoted");
         };
 
-        authenticate();
         hasVoted();
-    });
+    }, [rusheeName]);
 
     const client = useRef(null);
-        useEffect(() => {
-            if (sessionID.length === 0) { // check if empty string
+    useEffect(() => {
+        if (sessionID.length === 0) { // check if empty string
+            setContent("NoSession");
+            return;
+        }
+        
+        client.current = new W3CWebSocket(`${process.env.REACT_APP_WS_URL}${sessionID}/`);
+
+        client.current.onopen = () => {
+            setContent("Inactive");
+            console.log('WebSocket client connected: ', `${process.env.REACT_APP_WS_URL}${sessionID}/`);
+        };
+
+        client.current.onmessage = (message) => {
+            let messageJson = JSON.parse(message['data']);
+
+            setRusheeName((name) => {
+                if (messageJson['name'] === 'standards')
+                    return messageJson['message']['rushee_name'];
+                return name;
+            });
+        }
+
+        client.current.onclose = (event) => {
+            console.log("WebSocket client disconnected: ", event.reason);
+            setContent("Inactive");
+        }
+
+        client.current.onerror = (error) => {
+            console.error("WebSocket error: ", error);
+        }
+
+        return () => {
+            if (client.current) {
+                client.current.close();
+                console.log("WebSocket connection closed via cleanup.");
                 setContent("NoSession");
-                return;
             }
-            
-            client.current = new W3CWebSocket(`${process.env.REACT_APP_WS_URL}${sessionID}/`);
-    
-            client.current.onopen = () => {
-                setContent("Active");
-                console.log('WebSocket client connected: ', `${process.env.REACT_APP_WS_URL}${sessionID}/`);
-            };
-    
-            client.current.onmessage = (message) => {
-                console.log('received message!');
-                let messageJson = JSON.parse(message['data']);
-                console.log(messageJson['message']);
-                setRusheeName(messageJson['message']['rushee_name']);
-            }
-    
-            client.current.onclose = (event) => {
-                console.log("WebSocket client disconnected: ", event.reason);
-                setContent("Inactive");
-            }
-    
-            client.current.onerror = (error) => {
-                console.error("WebSocket error: ", error);
-            }
-    
-            return () => {
-                if (client.current) {
-                    client.current.close();
-                    console.log("WebSocket connection closed via cleanup.");
-                    setContent("Inactive");
-                }
-            }
-        }, [sessionID]);
+        }
+    }, [sessionID]);
+
+    useEffect(() => {
+        if (sessionID.length === 0)
+            return;
+
+        if (!rusheeName || rusheeName.length === 0)
+            setContent("Inactive");
+        else
+            setContent("Active");
+    }, [rusheeName, sessionID]);
 
     const SendVote = async (vote) => {
         let data = {
             'rushee_name': rusheeName,
             'vote': vote,
-            'email': user_email
+            'email': user_email.current
         };
 
         const response = await fetch(`${process.env.REACT_APP_API_URL}/poll/vote/`, {
@@ -124,15 +140,15 @@ export function Poll() {
 
         if (!client.current || client.current.readyState !== WebSocket.OPEN) {
             console.error("WebSocket not connected. Cannot send rushee name.");
+            setContent("NoSession");
             return;
         }
 
         client.current.send(JSON.stringify({
             type: 'message',
-            message: {rushee_name: rusheeName},
-            name: user_full_name
+            message: 'voted',
+            name: user_full_name.current
         }));
-        console.log('voter name sent');
 
         if (response.ok)
             setContent("ActiveVoted");
@@ -229,6 +245,8 @@ export function Poll() {
             <Header 
                 setLoggedIn={setLoggedIn}
                 displayLogout={true}
+                sessionID={sessionID}
+                user_full_name={user_full_name}
             />
             { renderContent() }
         </>
