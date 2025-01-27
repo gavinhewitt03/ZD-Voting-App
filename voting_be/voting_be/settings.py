@@ -34,7 +34,7 @@ DEBUG = os.getenv("DEBUG", False) == "True"
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    "zd-voting-backend.onrender.com"
+    'zd-voting-backend.onrender.com'
 ]
 
 CORS_ALLOWED_ORIGINS = [
@@ -93,12 +93,14 @@ TEMPLATES = [
 WSGI_APPLICATION = "voting_be.wsgi.application"
 ASGI_APPLICATION = "voting_be.asgi.application"
 
+hosts = [("127.0.0.1", 6379)] if os.getenv("DJANGO_ENV") == "development" else [os.getenv("REDIS_URL")]
+
 # this is only for deployment OR development on MAC/LINUX.
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [os.getenv("REDIS_URL", ("127.0.0.1", 6379))],
+            "hosts": hosts,
         },
     },
 }
