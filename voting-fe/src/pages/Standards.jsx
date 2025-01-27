@@ -50,7 +50,7 @@ export function Standards() {
             setContent("Inactive");
             return;
         }
-        
+
         client.current = new W3CWebSocket(`${process.env.REACT_APP_WS_URL}${sessionID}/`);
 
         client.current.onopen = () => {

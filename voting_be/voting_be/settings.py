@@ -94,9 +94,9 @@ TEMPLATES = [
 WSGI_APPLICATION = "voting_be.wsgi.application"
 ASGI_APPLICATION = "voting_be.asgi.application"
 
-print(os.getenv("REDIS_URL"))
-hosts = [("127.0.0.1", 6379)] if os.getenv("DJANGO_ENV") == "development" else [os.getenv("REDIS_URL")]
-print(hosts)
+
+# hosts = [("127.0.0.1", 6379)] if os.getenv("DJANGO_ENV") == "development" else [os.getenv("REDIS_URL")]
+hosts = [str(os.getenv("REDIS_URL"))]
 # this is only for deployment OR development on MAC/LINUX.
 CHANNEL_LAYERS = {
     "default": {
