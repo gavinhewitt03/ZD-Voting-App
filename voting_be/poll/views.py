@@ -65,3 +65,15 @@ def delete_poll(request):
 
     rushee_stats.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
+
+@api_view(['GET'])
+def test_redis(request):
+    import redis, os
+    client = redis.Redis(os.getenv("REDIS_URL"))
+
+    try:
+        client.ping()
+        print('connection successful')
+        client.close()
+    except Exception as e:
+        print(f'no, error: {e}')

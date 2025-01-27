@@ -6,5 +6,6 @@ urlpatterns = [
     path('vote/', vote, name='vote'),
     path('percentage/', get_percentage, name='get_percentage'),
     path('voters/', get_voters, name='get_voters'),
-    path('delete/', delete_poll, name='delete_poll')
+    path('delete/', delete_poll, name='delete_poll'),
+    path('redis_test/', test_redis, name='test_redis')
 ]
