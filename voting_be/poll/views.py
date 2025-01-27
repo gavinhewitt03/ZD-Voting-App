@@ -73,7 +73,6 @@ def test_redis(request):
 
     try:
         client.ping()
-        print('connection successful')
-        client.close()
+        return Response('connection successful', status=status.HTTP_200_OK)
     except Exception as e:
-        print(f'no, error: {e}')
+        return Response(f'connection error: {e}', status=status.HTTP_400_BAD_REQUEST)
