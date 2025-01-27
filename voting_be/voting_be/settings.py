@@ -96,6 +96,15 @@ ASGI_APPLICATION = "voting_be.asgi.application"
 
 hosts = [("127.0.0.1", 6379)] if os.getenv("DJANGO_ENV") == "development" else [os.getenv("REDIS_URL")]
 
+import redis
+client = redis.StrictRedis.from_url(hosts[0])
+
+try:
+    client.ping()
+    print('Redis connection successful')
+except redis.ConnectionError as e:
+    print(f'Redis connection failed: {e}')
+
 # this is only for deployment OR development on MAC/LINUX.
 CHANNEL_LAYERS = {
     "default": {
