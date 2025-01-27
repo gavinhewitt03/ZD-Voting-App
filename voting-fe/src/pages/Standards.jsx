@@ -64,7 +64,7 @@ export function Standards() {
         }
 
         client.current.onerror = (error) => {
-            console.error("WebSocket error: ", error);
+            console.error("WebSocket error: ", error.message);
         }
 
         return () => {
