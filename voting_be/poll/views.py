@@ -69,7 +69,7 @@ def delete_poll(request):
 @api_view(['GET'])
 def test_redis(request):
     import redis, os
-    client = redis.Redis(os.getenv("REDIS_URL"))
+    client = redis.Redis.from_url(os.getenv("REDIS_URL"))
 
     try:
         client.ping()
