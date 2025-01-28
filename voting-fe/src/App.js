@@ -20,9 +20,7 @@ function App() {
                     /> 
                 } />
                 <Route path="/home" element = {
-                    userGroups.length === 0 ? (
-                        <h1>Loading...</h1>
-                    ) : userGroups.includes("Standards") ? (
+                    userGroups.includes("Standards") ? (
                         <Standards />
                     ) : userGroups.includes("Regent") ? (
                         <Regent />
