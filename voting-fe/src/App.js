@@ -10,19 +10,6 @@ import React, { useState, useEffect } from 'react'
 
 function App() {
     const [userGroups, setUserGroups] = useState([]);
-    const [content, setContent] = useState(null);
-    
-    useEffect(() => {
-        if (userGroups.includes("Standards"))
-            setContent(<Standards />);
-        else if (userGroups.includes("Regent"))
-            setContent(<Regent />);
-        else if (userGroups.includes("Administrator"))
-            setContent(<User />);
-        else
-            setContent(<Poll />);
-        
-    });
 
     return (
         <Router>
@@ -32,8 +19,19 @@ function App() {
                         setUserGroups={setUserGroups}
                     /> 
                 } />
-                <Route path="/users" element={ <User /> } />
-                <Route path="/home" element = { content } />
+                <Route path="/home" element = {
+                    userGroups.length === 0 ? (
+                        <h1>Loading...</h1>
+                    ) : userGroups.includes("Standards") ? (
+                        <Standards />
+                    ) : userGroups.includes("Regent") ? (
+                        <Regent />
+                    ) : userGroups.includes("Administrator") ? (
+                        <User />
+                    ) : (
+                        <Poll />
+                    )
+                } />
                 <Route path="/createuser" element={ <CreateUser /> } />
             </Routes>
         </Router>
