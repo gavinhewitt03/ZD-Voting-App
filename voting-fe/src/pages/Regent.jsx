@@ -66,6 +66,7 @@ export function Regent() {
         };
 
         client.current.onmessage = async (message) => {
+            console.log(message);
             let messageJson = JSON.parse(message['data']);
 
             if (messageJson['name'] === 'for_regent' && messageJson['message'] === 'get_logged_in') {
