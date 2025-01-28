@@ -47,7 +47,7 @@ export function Regent() {
         };
 
         authenticate();
-    });
+    }, [rusheeName]);
 
     const client = useRef(null);
     useEffect(() => {
