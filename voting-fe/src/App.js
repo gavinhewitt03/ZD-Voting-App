@@ -10,13 +10,19 @@ import React, { useState, useEffect, useRef } from 'react'
 
 function App() {
     const userGroups = useRef([]);
+    const [, forceUpdate] = useState(false);
+
+    const updateUserGroups = (groups) => {
+        userGroups.current = groups;
+        forceUpdate((prev) => !prev);
+    };
 
     return (
         <Router>
             <Routes>
                 <Route path="/" element={ 
                     <LoginPage 
-                        userGroups={userGroups}
+                        updateUserGroups={updateUserGroups}
                     /> 
                 } />
                 <Route path="/home" element = {
