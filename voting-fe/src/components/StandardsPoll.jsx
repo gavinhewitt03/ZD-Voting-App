@@ -25,6 +25,7 @@ export function StandardsPoll({ sessionID }) {
         };
 
         client.current.onmessage = (message) => {
+            console.log('received: ', message);
             let messageJson = JSON.parse(message['data']);
             
             if (messageJson['message'] === 'voted' || messageJson['message'] === 'logged out') {
