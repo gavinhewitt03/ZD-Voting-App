@@ -6,7 +6,7 @@ import { Regent } from './pages/Regent'
 import { Standards } from './pages/Standards'
 import { Poll } from './pages/Poll'
 import { CreateUser } from './pages/CreateUser'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 
 function App() {
     const userGroups = useRef([]);
