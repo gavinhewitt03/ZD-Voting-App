@@ -4,7 +4,7 @@ import { Button } from '../components/Button'
 import { Link, useNavigate } from 'react-router-dom'
 import { InputField } from '../components/InputField'
 
-function Login({ setUserGroups }) {
+function Login({ userGroups }) {
     const [formData, setFormData] = useState({
         'email':'',
         'password':''
@@ -48,7 +48,7 @@ function Login({ setUserGroups }) {
                 //     })
                 // });
 
-                setUserGroups(data['groups']);
+                userGroups.current = data['groups'];
                 localStorage.setItem('accessToken', data['tokens']['access']);
                 localStorage.setItem('refreshToken', data['tokens']['refresh']);
                 navigate('/home');

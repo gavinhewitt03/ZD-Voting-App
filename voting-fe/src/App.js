@@ -9,14 +9,14 @@ import { CreateUser } from './pages/CreateUser'
 import React, { useState, useEffect } from 'react'
 
 function App() {
-    const [userGroups, setUserGroups] = useState([]);
+    const userGroups = useRef([]);
 
     return (
         <Router>
             <Routes>
                 <Route path="/" element={ 
                     <LoginPage 
-                        setUserGroups={setUserGroups}
+                        userGroups={userGroups}
                     /> 
                 } />
                 <Route path="/home" element = {
