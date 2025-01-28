@@ -22,7 +22,7 @@ function App() {
         else
             setContent(<Poll />);
         
-    }, [userGroups]);
+    });
 
     return (
         <Router>
