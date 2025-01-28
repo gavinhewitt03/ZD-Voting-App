@@ -20,11 +20,11 @@ function App() {
                     /> 
                 } />
                 <Route path="/home" element = {
-                    userGroups.includes("Standards") ? (
+                    userGroups.current.includes("Standards") ? (
                         <Standards />
-                    ) : userGroups.includes("Regent") ? (
+                    ) : userGroups.current.includes("Regent") ? (
                         <Regent />
-                    ) : userGroups.includes("Administrator") ? (
+                    ) : userGroups.current.includes("Administrator") ? (
                         <User />
                     ) : (
                         <Poll />
