@@ -89,7 +89,7 @@ export function Poll() {
             let messageJson = JSON.parse(message['data']);
 
             setRusheeName((name) => {
-                if (messageJson['name'] === 'standards')
+                if (messageJson['name'] === 'standards' || messageJson['name'] === 'history')
                     return messageJson['message']['rushee_name'];
                 return name;
             });

@@ -4,6 +4,8 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 
 
 class PollConsumer(AsyncWebsocketConsumer):
+    message_queue = []
+
     async def connect(self):
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
         self.room_group_name = f"poll_{self.room_name}"
@@ -12,6 +14,13 @@ class PollConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 
         await self.accept()
+
+        if len(self.message_queue) != 0:
+            await self.send(text_data=json.dumps({
+                "type": "poll.message",
+                "message": self.message_queue[-1],
+                "name": "history"
+            }))
 
     async def disconnect(self, close_code):
         # Leave room group
@@ -22,6 +31,13 @@ class PollConsumer(AsyncWebsocketConsumer):
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
         name = text_data_json["name"]
+
+        if isinstance(message, dict):
+            if message['rushee_name'] == '':
+                self.message_queue.clear()
+            else:
+                self.message_queue.append(message)
+
 
         # Send message to room group
         await self.channel_layer.group_send(
