@@ -14,7 +14,7 @@ function Login({ setUserGroups }) {
     const navigate = useNavigate();
 
     useEffect(() => {
-        localStorage.clear();
+        localStorage.removeItem("groups");
     }, []);
 
     const login = async (event) => {
@@ -40,18 +40,6 @@ function Login({ setUserGroups }) {
 
             const data = await response.json();
             if (response.ok) {
-                // let user_name = data['first_name'] + ' ' + data['last_name'];
-                // await fetch(`${process.env.REACT_APP_API_URL}/user/add_voter/`, {
-                //     method: 'POST',
-                //     headers: {
-                //         'Accept': 'application/json',
-                //         'Content-Type': 'application/json'
-                //     },
-                //     body: JSON.stringify({
-                //         full_name: user_name
-                //     })
-                // });
-
                 setUserGroups(() => { return data['groups'] } );
 
                 localStorage.setItem("groups", JSON.stringify(data['groups']));

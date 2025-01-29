@@ -19,8 +19,6 @@ export function Standards() {
             try {
                 const token = localStorage.getItem('accessToken');
 
-                console.log(token);
-
                 if (token) {
                     const config = {
                         headers: {
@@ -30,7 +28,6 @@ export function Standards() {
                     const response = await fetch(`${process.env.REACT_APP_API_URL}/user/get_user/`, config);
                     
                     const data = await response.json();
-                    console.log(data['email']);
                     if (response.ok && data['groups'].includes('Standards')) {
                         setLoggedIn(true);
                     } else {

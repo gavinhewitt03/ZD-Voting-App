@@ -42,16 +42,13 @@ export function StandardsPoll({ sessionID }) {
 
     useEffect(() => {
         client.current.onmessage = (message) => {
-            console.log('received: ', message);
             let messageJson = JSON.parse(message['data']);
             
             if (messageJson['message'] === 'voted' || messageJson['message'] === 'logged out') {
                 let removeName = messageJson['name'];
                 setRemainingVoters((voters) => {
                     if (voters.includes(removeName)) {
-                        console.log('remaining voters: ', remainingVoters);
                         const updatedVoters = remainingVoters.filter(voter => voter !== removeName);
-                        console.log('updated voters: ', updatedVoters);
                         return updatedVoters;
                     }
                     return voters;

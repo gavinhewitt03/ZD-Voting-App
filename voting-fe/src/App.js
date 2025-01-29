@@ -15,10 +15,8 @@ function App() {
     useEffect(() => {
         const storedGroupsJSON = JSON.parse(localStorage.getItem("groups"));
 
-        console.log("local storage groups: ", storedGroupsJSON);
         setUserGroups((prevGroups) => {
             if (storedGroupsJSON) {
-                console.log('in if');
                 storedGroupsJSON.forEach((group) => {
                     if (!prevGroups.includes(group)) { 
                         prevGroups.push(group) 
@@ -39,22 +37,18 @@ function App() {
         ) : (
             setContent(<Poll />)
         )
-
-        console.log('user groups: ', userGroups);
     }, [userGroups]);
 
     return (
-        <Router>
-            <Routes>
-                <Route path="/" element={ 
-                    <LoginPage 
-                        setUserGroups={setUserGroups}
-                    /> 
-                } />
-                <Route path="/home" element = { content } />
-                <Route path="/createuser" element={ <CreateUser /> } />
-            </Routes>
-        </Router>
+        <Routes>
+            <Route path="/" element={ 
+                <LoginPage 
+                    setUserGroups={setUserGroups}
+                /> 
+            } />
+            <Route path="/home" element = { content } />
+            <Route path="/createuser" element={ <CreateUser /> } />
+        </Routes>
      );
 }
 

@@ -24,6 +24,10 @@ export function CreateUser() {
 
     const [isLoading, setIsLoading] = useState(false);
 
+    const toProperCase = (str) => {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    };
+
     const handleSubmit = async (event) => {
         event.preventDefault();
 
@@ -48,9 +52,14 @@ export function CreateUser() {
                 })
             });
 
-            console.log("response: " + response.data);
-            setErrorMessage(response.data);
-            navigate('/');
+            const data = await response.json();
+            
+            if (data['error']) {
+                setErrorMessage(toProperCase(Object.values(data['error'])[0][0]));
+            }
+
+            if (response.ok)
+                navigate('/');
         } catch (error) {
             setErrorMessage(error);
         } finally {
@@ -65,9 +74,13 @@ export function CreateUser() {
                 <form>
                     <h2> Create User </h2>
                     {errorMessage && 
-                        <p className="login-text">
-                            {errorMessage}
-                        </p>
+                        <>
+                            <br />
+                            <p className="login-text" style={{textAlign: 'center'}}>
+                                {errorMessage}
+                            </p>
+                            <br />
+                        </>
                     }
                     <InputField
                         text="First Name:"

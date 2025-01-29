@@ -22,8 +22,6 @@ export function Regent() {
             try {
                 const token = localStorage.getItem('accessToken');
 
-                console.log(token);
-
                 if (token) {
                     const config = {
                         headers: {
@@ -34,7 +32,6 @@ export function Regent() {
                     
                     const data = await response.json();
 
-                    console.log(data['email']);
                     if (response.ok && data['groups'].includes('Regent')) {
                         setLoggedIn(true);
                     } else {
@@ -86,7 +83,6 @@ export function Regent() {
             return;
 
         client.current.onmessage = async (message) => {
-            console.log(message);
             let messageJson = JSON.parse(message['data']);
 
             if (messageJson['name'] === 'for_regent' && messageJson['message'] === 'get_logged_in') {
@@ -101,8 +97,8 @@ export function Regent() {
                 setRemainingVoters(voters);
             }
 
-            if (messageJson['name'] === 'standards' && messageJson['message']['rushee_name']) {
-                setRusheeName(messageJson['message']['rushee_name']);
+            if (messageJson['name'] === 'standards' && messageJson['message']['rushee_name'].length === 0) {
+                setRusheeName(() => messageJson['message']['rushee_name']);
                 setRemainingVoters((voters) => {
                     if (!rusheeName || rusheeName.length === 0) {
                         return [];
@@ -153,7 +149,7 @@ export function Regent() {
                             <br />
                             <br />
                             <Button
-                                label="Begin Session"
+                                label="Join Session"
                                 clickFunc={updateSession}
                                 className="red"
                             />
