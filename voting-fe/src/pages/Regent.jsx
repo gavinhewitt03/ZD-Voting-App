@@ -47,7 +47,7 @@ export function Regent() {
         };
 
         authenticate();
-    }, [rusheeName]);
+    }, []);
 
     const client = useRef(null);
     useEffect(() => {
@@ -64,6 +64,26 @@ export function Regent() {
             setContent("Active");
             console.log('WebSocket client connected: ', `${process.env.REACT_APP_WS_URL}${sessionID}/`);
         };
+
+        client.current.onclose = (event) => {
+            console.log("WebSocket client disconnected: ", event.reason);
+        }
+
+        client.current.onerror = (error) => {
+            console.error("WebSocket error: ", error);
+        }
+
+        return () => {
+            if (client.current) {
+                client.current.close();
+                console.log("WebSocket connection closed via cleanup.");
+            }
+        }
+    }, [sessionID]);
+
+    useEffect(() => {
+        if (!client.current)
+            return;
 
         client.current.onmessage = async (message) => {
             console.log(message);
@@ -101,21 +121,6 @@ export function Regent() {
                     }
                     return voters;
                 });
-            }
-        }
-
-        client.current.onclose = (event) => {
-            console.log("WebSocket client disconnected: ", event.reason);
-        }
-
-        client.current.onerror = (error) => {
-            console.error("WebSocket error: ", error);
-        }
-
-        return () => {
-            if (client.current) {
-                client.current.close();
-                console.log("WebSocket connection closed via cleanup.");
             }
         }
     }, [sessionID, remainingVoters]);

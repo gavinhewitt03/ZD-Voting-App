@@ -18,6 +18,7 @@ function App() {
         console.log("local storage groups: ", storedGroupsJSON);
         setUserGroups((prevGroups) => {
             if (storedGroupsJSON) {
+                console.log('in if');
                 storedGroupsJSON.forEach((group) => {
                     if (!prevGroups.includes(group)) { 
                         prevGroups.push(group) 
@@ -26,7 +27,9 @@ function App() {
             }
             return prevGroups;
         });
+    }, []);
 
+    useEffect(() => {
         userGroups.includes("Standards") ? (
             setContent(<Standards />)
         ) : userGroups.includes("Regent") ? (
@@ -38,19 +41,7 @@ function App() {
         )
 
         console.log('user groups: ', userGroups);
-    }, []);
-    
-    // useEffect(() => {
-    //     if (userGroups.includes("Standards"))
-    //         setContent(<Standards />);
-    //     else if (userGroups.includes("Regent"))
-    //         setContent(<Regent />);
-    //     else if (userGroups.includes("Administrator"))
-    //         setContent(<User />);
-    //     else
-    //         setContent(<Poll />);
-        
-    // }, [userGroups]);
+    }, [userGroups]);
 
     return (
         <Router>

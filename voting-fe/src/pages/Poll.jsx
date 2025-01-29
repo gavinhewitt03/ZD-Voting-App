@@ -4,8 +4,6 @@ import { Button } from '../components/Button'
 import { Header } from '../components/Header'
 import { w3cwebsocket as W3CWebSocket } from 'websocket'
 
-// rusheeName use effect would function as follows (I think): once rusheeName changes via request, set activePoll according to it being "" or an actual name
-
 export function Poll() {
     const [loggedIn, setLoggedIn] = useState(false);
     const navigate = useNavigate();
@@ -24,7 +22,6 @@ export function Poll() {
                 const token = localStorage.getItem('accessToken');
 
                 if (token) {
-                    console.log(token);
                     const config = {
                         headers: {
                             'Authorization': `Bearer ${token}`
@@ -35,8 +32,6 @@ export function Poll() {
                     const data = await response.json();
                     user_email.current = data['email'];
                     user_full_name.current = data['first_name'] + ' ' + data['last_name'];
-
-                    console.log(user_full_name);
 
                     if (response.ok) {
                         setLoggedIn(true);
@@ -50,8 +45,11 @@ export function Poll() {
         };
 
         authenticate();
-    });
+    }, []);
 
+    /* 
+        Checks if voter has voted when component mounts.
+    */
     useEffect(() => {
         const hasVoted = async () => {
             if (!rusheeName || rusheeName.length === 0)
@@ -71,7 +69,7 @@ export function Poll() {
         };
 
         hasVoted();
-    }, [rusheeName]);
+    }, []);
 
     const client = useRef(null);
     useEffect(() => {

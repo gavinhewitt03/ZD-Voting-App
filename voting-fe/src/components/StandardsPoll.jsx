@@ -24,22 +24,6 @@ export function StandardsPoll({ sessionID }) {
             console.log('WebSocket client connected: ', `${process.env.REACT_APP_WS_URL}${sessionID}/`);
         };
 
-        client.current.onmessage = (message) => {
-            console.log('received: ', message);
-            let messageJson = JSON.parse(message['data']);
-            
-            if (messageJson['message'] === 'voted' || messageJson['message'] === 'logged out') {
-                let removeName = messageJson['name'];
-                setRemainingVoters((voters) => {
-                    if (voters.includes(removeName)) {
-                        const updatedVoters = remainingVoters.filter(voter => voter !== removeName);
-                        return updatedVoters;
-                    }
-                    return voters;
-                });
-            }
-        }
-
         client.current.onclose = (event) => {
             console.log("WebSocket client disconnected: ", event.reason);
         }
@@ -54,7 +38,27 @@ export function StandardsPoll({ sessionID }) {
                 console.log("WebSocket connection closed via cleanup.");
             }
         }
-    }, [sessionID, remainingVoters]);
+    }, [sessionID]);
+
+    useEffect(() => {
+        client.current.onmessage = (message) => {
+            console.log('received: ', message);
+            let messageJson = JSON.parse(message['data']);
+            
+            if (messageJson['message'] === 'voted' || messageJson['message'] === 'logged out') {
+                let removeName = messageJson['name'];
+                setRemainingVoters((voters) => {
+                    if (voters.includes(removeName)) {
+                        console.log('remaining voters: ', remainingVoters);
+                        const updatedVoters = remainingVoters.filter(voter => voter !== removeName);
+                        console.log('updated voters: ', updatedVoters);
+                        return updatedVoters;
+                    }
+                    return voters;
+                });
+            }
+        }
+    }, [sessionID, remainingVoters])
 
     const sendRusheeName = () => {
         if (!client.current || client.current.readyState !== WebSocket.OPEN) {

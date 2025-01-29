@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Header } from '../components/Header'
 import { Button } from '../components/Button'
 import { Link, useNavigate } from 'react-router-dom'
@@ -12,6 +12,10 @@ function Login({ setUserGroups }) {
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState(null);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        localStorage.clear();
+    }, []);
 
     const login = async (event) => {
         event.preventDefault();
@@ -48,7 +52,7 @@ function Login({ setUserGroups }) {
                 //     })
                 // });
 
-                setUserGroups(data['groups']);
+                setUserGroups(() => { return data['groups'] } );
 
                 localStorage.setItem("groups", JSON.stringify(data['groups']));
                 localStorage.setItem('accessToken', data['tokens']['access']);
