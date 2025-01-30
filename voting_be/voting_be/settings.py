@@ -31,17 +31,20 @@ SECRET_KEY = os.getenv("SECRET_KEY", "")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", False) == "True"
 
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    'zd-voting-backend.onrender.com',
-    'zd-voting-frontend.onrender.com'
-]
+# ALLOWED_HOSTS = [
+#     'localhost',
+#     '127.0.0.1',
+#     'zd-voting-backend.onrender.com',
+#     'zd-voting-frontend.onrender.com'
+# ]
 
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
-    'https://zd-voting-frontend.onrender.com'
-]
+# CORS_ALLOWED_ORIGINS = [
+#     'http://localhost:3000',
+#     'https://zd-voting-frontend.onrender.com'
+# ]
+
+CORS_ALLOW_ALL_ORIGINS = True
+ALLOWED_HOSTS = ['*']
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -104,6 +107,7 @@ CHANNEL_LAYERS = {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
             "hosts": hosts,
+            "expiry": 300 # messages expire after 5 minutes
         },
     },
 }

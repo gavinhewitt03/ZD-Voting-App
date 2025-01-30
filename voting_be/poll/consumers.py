@@ -32,11 +32,10 @@ class PollConsumer(AsyncWebsocketConsumer):
         message = text_data_json["message"]
         name = text_data_json["name"]
 
-        if isinstance(message, dict):
-            if message['rushee_name'] == '':
-                self.message_queue.clear()
-            else:
-                self.message_queue.append(message)
+        if isinstance(message, dict) and message['rushee_name'] == '':
+            self.message_queue.clear()
+        elif isinstance(message, dict):
+            self.message_queue.append(message)
 
 
         # Send message to room group
@@ -53,7 +52,7 @@ class PollConsumer(AsyncWebsocketConsumer):
     async def poll_message(self, event):
         message = event["message"]
         name = event["name"]
-
+ 
         # Send message to WebSocket
         await self.send(text_data=json.dumps(
             {

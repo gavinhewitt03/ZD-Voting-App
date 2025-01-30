@@ -12,6 +12,9 @@ def vote(request):
     voter_email = request.data['email']
     rushee_stats = get_object_or_404(Poll, rushee_name=rushee_name)
 
+    if voter_email in rushee_stats.voters:
+        return Response({"message": "vote has already been counted."}, status=status.HTTP_204_NO_CONTENT)
+
     rushee_stats.voters.append(voter_email)
 
     if vote:

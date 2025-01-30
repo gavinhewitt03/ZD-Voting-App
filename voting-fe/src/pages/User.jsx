@@ -70,10 +70,7 @@ export function User() {
 
     return(
         <>
-            <Header
-                setLoggedIn={setLoggedIn}
-                displayLogout={true}
-            />
+            <Header />
             { loggedIn && 
                 <div style={{ marginTop: '8vh'}}>
                     <table className="user-table">

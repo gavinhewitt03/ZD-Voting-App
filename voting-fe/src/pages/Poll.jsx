@@ -9,6 +9,7 @@ export function Poll() {
     const navigate = useNavigate();
 
     const [content, setContent] = useState("NoSession");
+    const [isLoading, setIsLoading] = useState(false);
     const [rusheeName, setRusheeName] = useState("");
 
     const [sessionID, setSessionID] = useState("");
@@ -47,13 +48,12 @@ export function Poll() {
         authenticate();
     }, []);
 
-    /* 
-        Checks if voter has voted when component mounts.
-    */
     useEffect(() => {
         const hasVoted = async () => {
             if (!rusheeName || rusheeName.length === 0)
                 return;
+
+            setIsLoading(true);
 
             const params = {rushee_name: rusheeName};
             const queryParams = new URLSearchParams(params).toString();
@@ -61,15 +61,19 @@ export function Poll() {
 
             const voters = (await response.json())['voters'];
 
-            if (!voters)
+            if (!voters) {
+                setIsLoading(false);
                 return;
-
-            if (voters.includes(user_email))
+            }
+            
+            if (voters.includes(user_email.current))
                 setContent("ActiveVoted");
+
+            setIsLoading(false);
         };
 
         hasVoted();
-    }, []);
+    }, [sessionID, rusheeName]);
 
     const client = useRef(null);
     useEffect(() => {
@@ -163,6 +167,12 @@ export function Poll() {
     }
 
     const renderContent = () => {
+        if (isLoading) {
+            return (
+                <h1 className="red">Loading...</h1>
+            );
+        }
+        
         switch(content) {
             case "Active":
                 return (
@@ -230,6 +240,14 @@ export function Poll() {
         }
     }
 
+    const sendLogoutMessage = () => {
+        client.current.send(JSON.stringify({
+            type: 'message',
+            message: 'logged out',
+            name: user_full_name.current
+        }));
+    };
+
     if (!loggedIn) {
         return (
             <>
@@ -246,8 +264,8 @@ export function Poll() {
             <Header 
                 setLoggedIn={setLoggedIn}
                 displayLogout={true}
-                sessionID={sessionID}
                 user_full_name={user_full_name}
+                sendLogoutMessage={sendLogoutMessage}
             />
             { renderContent() }
         </>
