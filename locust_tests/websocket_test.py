@@ -35,23 +35,22 @@ class WebSocketPollSender(User):
             print(f'{self.user_id} message sent')
 
 from locust import User, task, events
-from geventwebsocket import websocket
 import gevent
+import websocket
 
 class WebSocketUser(User):
     def on_start(self):
-        """Establish WebSocket connection at the start of the test."""
+        """Establish WebSocket connection to Django Channels."""
         self.ws = websocket.WebSocket()
         self.ws.connect(WS_URL)
+        self.user_id = self.environment.runner.user_count
 
     @task
     def send_message(self):
         """Send and receive messages over WebSocket."""
-        self.ws.send("Hello WebSocket!")
-        response = self.ws.recv()
-        print(f"Received: {response}")
-        gevent.sleep(1)  # Simulate think time
+        self.ws.send(json.dump({"message": f"{self.user_id}", "name": self.user_id}))
+        gevent.sleep(1)  # Simulate real user think-time
 
     def on_stop(self):
-        """Close WebSocket connection at the end."""
+        """Close WebSocket connection."""
         self.ws.close()

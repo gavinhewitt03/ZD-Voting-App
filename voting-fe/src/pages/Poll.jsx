@@ -91,6 +91,7 @@ export function Poll() {
 
         client.current.onmessage = (message) => {
             let messageJson = JSON.parse(message['data']);
+            console.log(messageJson);
 
             setRusheeName((name) => {
                 if (messageJson['name'] === 'standards' || messageJson['name'] === 'history')

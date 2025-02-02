@@ -151,6 +151,12 @@ export function StandardsPoll({ sessionID }) {
                     </h3>
                     <br /><br />
                     <Button
+                        label="Resend Poll"
+                        clickFunc={sendRusheeName}
+                        className="red"
+                    />
+                    &emsp;
+                    <Button
                         label="End Poll"
                         clickFunc={endPoll}
                         className="red"

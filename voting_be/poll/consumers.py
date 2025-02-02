@@ -4,11 +4,10 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 
 
 class PollConsumer(AsyncWebsocketConsumer):
-    message_queue = []
-
     async def connect(self):
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
         self.room_group_name = f"poll_{self.room_name}"
+        self.message_queue = []
 
         # Join room group
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
