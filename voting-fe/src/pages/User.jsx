@@ -66,79 +66,105 @@ export function User() {
         authenticate();
     }, []);
 
+    const clearLogIn = async () => {
+        await fetch(`${process.env.REACT_APP_API_URL}/user/clear/`, {
+            method: 'DELETE'
+        });
+    };
+
+    const forceLogout = async (fullName) => {
+        await fetch(`${process.env.REACT_APP_API_URL}/user/force/`, {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                'full_name': fullName
+            })
+        })
+    };
+
     if (isLoading) return <p>Loading...</p>;
 
     return(
         <>
             <Header />
             { loggedIn && 
-                <div style={{ marginTop: '8vh'}}>
-                    <table className="user-table">
-                        <tr>
-                            <td  style={{ width: '40%' }}>
-                                <p className='user-table-text'>
-                                    Email
-                                </p>
-                            </td>
-                            <td style={{ width: '20%' }}>
-                                <p className='user-table-text'>
-                                    First Name
-                                </p>
-                            </td>
-                            <td style={{ width: '20%' }}>
-                                <p className='user-table-text'>
-                                    Last Name
-                                </p>
-                            </td>
-                            <td style={{ width: '10%' }}>
-                                <p className='user-table-text'>
-                                Active
-                                </p>
-                            </td>
-                            <td style={{ width: '10%' }}></td>
-                        </tr>
-                        {
-                            userList.map(user => (
-                                <tr key={user.id}>
-                                    <td>
-                                        <p className='user-table-text'>
-                                            {user.email}
-                                        </p>
-                                    </td>
-                                    <td className='user-table-text'>
-                                        <p className='user-table-text'>
-                                            {user.first_name}
-                                        </p>
-                                    </td>
-                                    <td className='user-table-text'>
-                                        <p className='user-table-text'>
-                                            {user.last_name}
-                                        </p>
-                                    </td>
-                                    <td>
-                                        <div className='flex-box'>
-                                            <ToggleSlider
-                                                active={user.is_active}
-                                                barBackgroundColorActive='#FC3'
-                                                onToggle={() => UpdateIsActive(user)}
+                <>
+                    <div style={{display: 'flex', marginTop: '1vh'}} className="right-align">
+                        <Button
+                            label="Clear Log In"
+                            clickFunc={() => clearLogIn()}
+                            className="yellow"
+                        />
+                    </div>
+                    <div style={{ marginTop: '8vh'}}>
+                        <table className="user-table">
+                            <tr>
+                                <td  style={{ width: '40%' }}>
+                                    <p className='user-table-text'>
+                                        Email
+                                    </p>
+                                </td>
+                                <td style={{ width: '20%' }}>
+                                    <p className='user-table-text'>
+                                        First Name
+                                    </p>
+                                </td>
+                                <td style={{ width: '20%' }}>
+                                    <p className='user-table-text'>
+                                        Last Name
+                                    </p>
+                                </td>
+                                <td style={{ width: '10%' }}>
+                                    <p className='user-table-text'>
+                                    Active
+                                    </p>
+                                </td>
+                                <td style={{ width: '10%' }}></td>
+                            </tr>
+                            {
+                                userList.map(user => (
+                                    <tr key={user.id}>
+                                        <td>
+                                            <p className='user-table-text'>
+                                                {user.email}
+                                            </p>
+                                        </td>
+                                        <td className='user-table-text'>
+                                            <p className='user-table-text'>
+                                                {user.first_name}
+                                            </p>
+                                        </td>
+                                        <td className='user-table-text'>
+                                            <p className='user-table-text'>
+                                                {user.last_name}
+                                            </p>
+                                        </td>
+                                        <td>
+                                            <div className='flex-box'>
+                                                <ToggleSlider
+                                                    active={user.is_active}
+                                                    barBackgroundColorActive='#FC3'
+                                                    onToggle={() => UpdateIsActive(user)}
+                                                />
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <Button
+                                                label="Logout"
+                                                clickFunc={() => forceLogout(`${user.first_name} ${user.last_name}`)}
+                                                className="yellow"
                                             />
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <Button
-                                            label="Logout"
-                                            clickFunc={() => {}}
-                                            className="yellow"
-                                        />
-                                    </td>
-                                </tr>
-                            ))
-                        }
-                    </table>
-                </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            }
+                        </table>
+                    </div>
+                </> 
             }
-            
-            
         </>
     );
 }

@@ -129,3 +129,18 @@ def get_full_name(request):
     user = get_object_or_404(CustomUser, email=email)
 
     return Response({'full_name': user.get_full_name()})
+
+@api_view(['DELETE'])
+def force_logout(request):
+    full_name = request.data['full_name']
+     
+    user = get_object_or_404(LoggedInUsers, full_name=full_name)
+    user.delete()
+
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+@api_view(['DELETE'])
+def clear_logged_in(request):
+    LoggedInUsers.objects.all().delete()
+
+    return Response(status=status.HTTP_204_NO_CONTENT)
