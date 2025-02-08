@@ -191,7 +191,7 @@ button.red-button:active {
      transform: scale(0.97);
 }
 
-button.red-button:active {
+button.red-button:hover {
     background: #7c0000ab;
     transition: 0.4s ease;
     -webkit-box-shadow: inset 0px 0px 5px #c1c1c1;
