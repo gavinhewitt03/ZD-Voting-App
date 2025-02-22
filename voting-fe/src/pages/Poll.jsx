@@ -184,13 +184,19 @@ export function Poll() {
                         <div className='center' style={{marginTop: '45px'}}>
                             <Button
                                 label="Yes"
-                                clickFunc={ () => SendVote(true) }
+                                clickFunc={ () => SendVote('yes') }
+                                className="red"
+                            />
+                            &emsp;
+                            <Button
+                                label="I Don't Know"
+                                clickFunc={ () => SendVote('idk') }
                                 className="red"
                             />
                             &emsp;
                             <Button
                                 label="No"
-                                clickFunc={ () => SendVote(false) }
+                                clickFunc={ () => SendVote('no') }
                                 className="red"
                             />
                             </div>

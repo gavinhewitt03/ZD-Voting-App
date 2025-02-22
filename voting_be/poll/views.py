@@ -17,12 +17,15 @@ def vote(request):
 
     rushee_stats.voters.append(voter_email)
 
-    if vote:
+    if vote == 'yes':
         rushee_stats.yes_votes += 1
         serializer = PollSerializer(rushee_stats, {'yes_votes': rushee_stats.yes_votes, 'voters': rushee_stats.voters}, partial=True)
-    else:
+    elif vote == 'no':
         rushee_stats.no_votes += 1
         serializer = PollSerializer(rushee_stats, {'no_votes': rushee_stats.no_votes, 'voters': rushee_stats.voters}, partial=True)
+    else:
+        rushee_stats.idk_votes += 1
+        serializer = PollSerializer(rushee_stats, {'idk_votes': rushee_stats.idk_votes, 'voters': rushee_stats.voters}, partial=True)
 
     if serializer.is_valid():
         serializer.save()
@@ -45,7 +48,7 @@ def get_percentage(request):
     rushee_name = request.query_params.get('rushee_name')
     rushee_stats = get_object_or_404(Poll, rushee_name=rushee_name)
 
-    total_votes = rushee_stats.yes_votes + rushee_stats.no_votes
+    total_votes = rushee_stats.yes_votes + rushee_stats.no_votes + rushee_stats.idk_votes
 
     if total_votes == 0:
         return Response({"percentage": f"{0:.2f}"}, status=status.HTTP_200_OK)
@@ -53,6 +56,26 @@ def get_percentage(request):
     percentage = rushee_stats.yes_votes / total_votes
 
     return Response({"percentage": f"{percentage*100:.2f}"}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_percentage_breakdown(request):
+    rushee_name = request.query_params.get('rushee_name')
+    rushee_stats = get_object_or_404(Poll, rushee_name=rushee_name)
+
+    total_votes = rushee_stats.yes_votes + rushee_stats.no_votes + rushee_stats.idk_votes
+
+    if total_votes == 0:
+        return Response({"yes": (f"{0:.2f}", rushee_stats.yes_votes), 
+                         "no": (f"{0:.2f}", rushee_stats.no_votes), 
+                         "idk": (f"{0:.2f}", rushee_stats.idk_votes)}, status=status.HTTP_200_OK)
+
+    yes_percentage = rushee_stats.yes_votes / total_votes
+    no_percentage = rushee_stats.no_votes / total_votes
+    idk_percentage = rushee_stats.idk_votes / total_votes
+
+    return Response({"yes": (f"{yes_percentage*100:.2f}", rushee_stats.yes_votes), 
+                     "no": (f"{no_percentage*100:.2f}", rushee_stats.no_votes), 
+                     "idk": (f"{idk_percentage*100:.2f}", rushee_stats.idk_votes)}, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def get_voters(request):

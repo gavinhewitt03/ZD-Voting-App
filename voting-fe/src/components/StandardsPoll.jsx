@@ -5,6 +5,9 @@ import { w3cwebsocket as W3CWebSocket } from 'websocket'
 
 export function StandardsPoll({ sessionID }) {
     const [percentage, setPercentage] = useState(0.0);
+    const [yesData, setYesData] = useState(null);
+    const [noData, setNoData] = useState(null);
+    const [idkData, setIdkData] = useState(null);
     const [rusheeName, setRusheeName] = useState("");
     const [activePoll, setActivePoll] = useState(false);
     const [remainingVoters, setRemainingVoters] = useState([]);
@@ -82,6 +85,7 @@ export function StandardsPoll({ sessionID }) {
                 rushee_name: rusheeName,
                 yes_votes: 0,
                 no_votes: 0,
+                idk_votes: 0,
                 voters: []
             })
         });
@@ -110,13 +114,48 @@ export function StandardsPoll({ sessionID }) {
         setPercentage(0.0);
     }
 
+    // const endPoll = async () => {
+        // const params = {rushee_name: rusheeName};
+        // const queryParams = new URLSearchParams(params).toString();
+        // const getResponse = await fetch(`${process.env.REACT_APP_API_URL}/poll/percentage/?${queryParams}`);
+        // const getData = await getResponse.json();
+
+        // setPercentage(getData['percentage']);
+
+        // const deleteResponse = await fetch(`${process.env.REACT_APP_API_URL}/poll/delete/`, {
+        //     method: 'DELETE',
+        //     headers: {
+        //         'Accept': 'application/json',
+        //         'Content-Type': 'application/json'
+        //     },
+        //     body: JSON.stringify({
+        //         rushee_name: rusheeName
+        //     })
+        // })
+
+        // client.current.send(JSON.stringify({
+        //     type: 'message',
+        //     message: {rushee_name: ""},
+        //     name: 'standards'
+        // }));
+
+        // setActivePoll(false);
+    // }
+
     const endPoll = async () => {
         const params = {rushee_name: rusheeName};
         const queryParams = new URLSearchParams(params).toString();
-        const getResponse = await fetch(`${process.env.REACT_APP_API_URL}/poll/percentage/?${queryParams}`);
-        const getData = await getResponse.json();
+        const percentResponse = await fetch(`${process.env.REACT_APP_API_URL}/poll/percentage/?${queryParams}`);
+        const percentData = await percentResponse.json();
 
-        setPercentage(getData['percentage']);
+        setPercentage(percentData['percentage']);
+
+        const breakdownResponse = await fetch(`${process.env.REACT_APP_API_URL}/poll/breakdown/?${queryParams}`);
+        const breakdownData = await breakdownResponse.json();
+
+        setYesData(breakdownData['yes']);
+        setNoData(breakdownData['no']);
+        setIdkData(breakdownData['idk']);
 
         const deleteResponse = await fetch(`${process.env.REACT_APP_API_URL}/poll/delete/`, {
             method: 'DELETE',
@@ -171,7 +210,7 @@ export function StandardsPoll({ sessionID }) {
         return (
             <div className="poll-section">
                 <h3 className="red" style={{textDecorationLine: 'none'}}>
-                    Insert Rushee Name Here:
+                    Insert PNM Name Here:
                 </h3>
                 <input 
                     type="text" 
@@ -194,7 +233,15 @@ export function StandardsPoll({ sessionID }) {
             <h3 className="red" style={{textDecorationLine: 'none'}}>
                 {rusheeName}: {percentage}%
             </h3>
-            <br /><br />
+            <br />
+            <p className="red">
+                Yes: {yesData[0]}%, {yesData[1]} votes
+                <br />
+                No: {noData[0]}%, {noData[1]} votes
+                <br />
+                I Don't Know: {idkData[0]}%, {idkData[1]} votes
+            </p>
+            <br />
             <Button
                 label="Next"
                 clickFunc={next}
