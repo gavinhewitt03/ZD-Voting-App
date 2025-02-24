@@ -4,6 +4,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from .models import Poll
 from .serializers import PollSerializer
+from django.db import transaction
+from django.db.utils import IntegrityError
 
 @api_view(['POST'])
 def vote(request):
@@ -17,21 +19,21 @@ def vote(request):
 
     rushee_stats.voters.append(voter_email)
 
-    if vote == 'yes':
-        rushee_stats.yes_votes += 1
-        serializer = PollSerializer(rushee_stats, {'yes_votes': rushee_stats.yes_votes, 'voters': rushee_stats.voters}, partial=True)
-    elif vote == 'no':
-        rushee_stats.no_votes += 1
-        serializer = PollSerializer(rushee_stats, {'no_votes': rushee_stats.no_votes, 'voters': rushee_stats.voters}, partial=True)
-    else:
-        rushee_stats.idk_votes += 1
-        serializer = PollSerializer(rushee_stats, {'idk_votes': rushee_stats.idk_votes, 'voters': rushee_stats.voters}, partial=True)
+    try:
+        with transaction.atomic():          
+            if vote == 'yes':
+                rushee_stats.yes_votes += 1
+            elif vote == 'no':
+                rushee_stats.no_votes += 1
+            else:
+                rushee_stats.idk_votes += 1
 
-    if serializer.is_valid():
-        serializer.save()
-        return Response({"message": "Vote has been received."}, status=status.HTTP_200_OK)
-
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)   
+            rushee_stats.save(update_fields=['yes_votes', 'no_votes', 'idk_votes', 'voters'])
+            return Response({"message": "Vote has been received."}, status=status.HTTP_200_OK)
+    except IntegrityError as e:
+        return Response({"error": f"Database error: {e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    except Exception as e:
+        return Response({"error": f"Error voting: {e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['POST'])
 def create_poll(request):
@@ -64,14 +66,12 @@ def get_percentage_breakdown(request):
 
     total_votes = rushee_stats.yes_votes + rushee_stats.no_votes + rushee_stats.idk_votes
 
-    if total_votes == 0:
-        return Response({"yes": (f"{0:.2f}", rushee_stats.yes_votes), 
-                         "no": (f"{0:.2f}", rushee_stats.no_votes), 
-                         "idk": (f"{0:.2f}", rushee_stats.idk_votes)}, status=status.HTTP_200_OK)
+    yes_percentage, no_percentage, idk_percentage = 0, 0, 0
 
-    yes_percentage = rushee_stats.yes_votes / total_votes
-    no_percentage = rushee_stats.no_votes / total_votes
-    idk_percentage = rushee_stats.idk_votes / total_votes
+    if total_votes != 0:
+        yes_percentage = rushee_stats.yes_votes / total_votes
+        no_percentage = rushee_stats.no_votes / total_votes
+        idk_percentage = rushee_stats.idk_votes / total_votes
 
     return Response({"yes": (f"{yes_percentage*100:.2f}", rushee_stats.yes_votes), 
                      "no": (f"{no_percentage*100:.2f}", rushee_stats.no_votes), 
