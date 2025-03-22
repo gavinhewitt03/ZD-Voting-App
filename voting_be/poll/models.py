@@ -2,8 +2,15 @@ from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
 class Poll(models.Model):
+    # class Vote(models.TextChoices):
+    #     YES = 'yes'
+    #     NO = 'no'
+    #     IDK = 'idk'
+    
     rushee_name = models.CharField(max_length=150, blank=False, null=False, verbose_name='rushee name', unique=True)
-    yes_votes = models.IntegerField(blank=False, null=False, verbose_name='yes votes')
-    idk_votes = models.IntegerField(blank=False, null=False, verbose_name='i don\'t know  votes')
-    no_votes = models.IntegerField(blank=False, null=False, verbose_name='no votes')
-    voters = ArrayField(models.EmailField(max_length=255), blank=True, null=False, verbose_name='voters', default=list)
+    voter = models.CharField(max_length=150, blank=False, null=False, verbose_name='voter email', unique=False)
+    vote = models.CharField(max_length=3, blank=False, null=False, verbose_name='vote')
+
+    class Meta:
+        verbose_name = 'poll'
+        unique_together = ('rushee_name', 'voter')
