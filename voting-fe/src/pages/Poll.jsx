@@ -48,32 +48,31 @@ export function Poll() {
         authenticate();
     }, []);
 
-    // useEffect(() => {
-    //     const hasVoted = async () => {
-    //         if (!rusheeName || rusheeName.length === 0)
-    //             return;
+    useEffect(() => {
+        const hasVoted = async () => {
+            if (!rusheeName || rusheeName.length === 0)
+                return;
 
-    //         setIsLoading(true);
+            setIsLoading(true);
 
-    //         const params = {rushee_name: rusheeName};
-    //         const queryParams = new URLSearchParams(params).toString();
-    //         const response = await fetch(`${process.env.REACT_APP_API_URL}/poll/voters/?${queryParams}`)
+            const params = {rushee_name: rusheeName, email: user_email.current};
+            const queryParams = new URLSearchParams(params).toString();
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/poll/voted/?${queryParams}`)
 
-    //         const voters = (await response.json())['voters'];
+            const has_voted = (await response.json())['has_voted'];
+            console.log(has_voted);
 
-    //         if (!voters) {
-    //             setIsLoading(false);
-    //             return;
-    //         }
-            
-    //         if (voters.includes(user_email.current))
-    //             setContent("ActiveVoted");
+            if (!has_voted) {
+                setIsLoading(false);
+                return;
+            }
 
-    //         setIsLoading(false);
-    //     };
+            setContent("ActiveVoted");
+            setIsLoading(false);
+        };
 
-    //     hasVoted();
-    // }, [sessionID, rusheeName]);
+        hasVoted();
+    }, [sessionID, rusheeName]);
 
     const client = useRef(null);
     useEffect(() => {

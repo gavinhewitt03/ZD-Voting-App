@@ -75,20 +75,6 @@ export function StandardsPoll({ sessionID }) {
 
     const startPoll = async () => {
         sendRusheeName();
-        const postResponse = await fetch(`${process.env.REACT_APP_API_URL}/poll/create/`, {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                rushee_name: rusheeName,
-                yes_votes: 0,
-                no_votes: 0,
-                idk_votes: 0,
-                voters: []
-            })
-        });
 
         client.current.send(JSON.stringify({
             type: 'message',
@@ -113,34 +99,6 @@ export function StandardsPoll({ sessionID }) {
         setRusheeName("");
         setPercentage(0.0);
     }
-
-    // const endPoll = async () => {
-        // const params = {rushee_name: rusheeName};
-        // const queryParams = new URLSearchParams(params).toString();
-        // const getResponse = await fetch(`${process.env.REACT_APP_API_URL}/poll/percentage/?${queryParams}`);
-        // const getData = await getResponse.json();
-
-        // setPercentage(getData['percentage']);
-
-        // const deleteResponse = await fetch(`${process.env.REACT_APP_API_URL}/poll/delete/`, {
-        //     method: 'DELETE',
-        //     headers: {
-        //         'Accept': 'application/json',
-        //         'Content-Type': 'application/json'
-        //     },
-        //     body: JSON.stringify({
-        //         rushee_name: rusheeName
-        //     })
-        // })
-
-        // client.current.send(JSON.stringify({
-        //     type: 'message',
-        //     message: {rushee_name: ""},
-        //     name: 'standards'
-        // }));
-
-        // setActivePoll(false);
-    // }
 
     const endPoll = async () => {
         const params = {rushee_name: rusheeName};

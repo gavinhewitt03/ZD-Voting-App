@@ -67,6 +67,15 @@ def get_percentage_breakdown(request):
 
 #     return Response({"voters": rushee_stats.voters}, status=status.HTTP_200_OK)
 
+@api_view(['GET'])
+def has_voted(request):
+    rushee_name = request.query_params.get('rushee_name')
+    voter_email = request.query_params.get('email')
+
+    votes = Poll.objects.filter(rushee_name=rushee_name, voter=voter_email)
+
+    return Response({"has_voted": len(votes) > 0}, status=status.HTTP_200_OK)
+
 @api_view(['DELETE'])
 def delete_poll(request):
     rushee_name = request.data['rushee_name']
