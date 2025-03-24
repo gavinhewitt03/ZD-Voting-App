@@ -16,11 +16,13 @@ def vote(request):
     print(f"vote: {vote}, rushee_name: {rushee_name}, voter_email: {voter_email}")
 
     try:
-        poll = Poll.objects.create(rushee_name=rushee_name, voter=voter_email, vote=vote)
-        print("poll created")
-        poll.save()
-        print("poll saved")
-    except:
+        with transaction.atomic():
+            poll = Poll.objects.create(rushee_name=rushee_name, voter=voter_email, vote=vote)
+            poll.save()
+    except IntegrityError:
+        return Response({"error": "Your vote has already been submitted."}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        print(f"error: {e}")
         return Response({"error": "There was an error registering your vote."}, status=status.HTTP_400_BAD_REQUEST)
     
     return Response({'message': 'Your vote has been registered.'}, status=status.HTTP_201_CREATED)
