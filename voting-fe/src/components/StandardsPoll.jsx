@@ -196,8 +196,8 @@ export function StandardsPoll({ sessionID }) {
                 Yes: {yesData[0]}%, {yesData[1]} votes
                 <br />
                 No: {noData[0]}%, {noData[1]} votes
-                <br />
-                I Don't Know: {idkData[0]}%, {idkData[1]} votes
+                {/* <br />
+                I Don't Know: {idkData[0]}%, {idkData[1]} votes */}
             </p>
             <br />
             <Button

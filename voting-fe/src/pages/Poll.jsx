@@ -187,12 +187,12 @@ export function Poll() {
                                 className="red"
                             />
                             &emsp;
-                            <Button
+                            {/* <Button
                                 label="I Don't Know"
                                 clickFunc={ () => SendVote('idk') }
                                 className="red"
                             />
-                            &emsp;
+                            &emsp; */}
                             <Button
                                 label="No"
                                 clickFunc={ () => SendVote('no') }
