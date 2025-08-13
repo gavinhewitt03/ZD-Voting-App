@@ -4,12 +4,15 @@ import { Button } from "../components/Button";
 import { Header } from "../components/Header";
 import { StandardsPoll } from '../components/StandardsPoll';
 import { w3cwebsocket as W3CWebSocket } from 'websocket';
+import { ToggleSlider } from 'react-toggle-slider';
 
 export function Standards() {
     const [sessionID, setSessionID] = useState("");
     const [sessionInput, setSessionInput] = useState("");
 
     const [content, setContent] = useState("Inactive");
+    const [showIdk, setShowIdk] = useState(false);
+    const [isRush, setIsRush] = useState(false);
 
     const [loggedIn, setLoggedIn] = useState(false);
     const navigate = useNavigate();
@@ -39,10 +42,34 @@ export function Standards() {
             }
         };
 
+        const getShowIdk = async () => {
+            try {
+                const response = await fetch(`${process.env.REACT_APP_API_URL}/poll/get_idk/`);
+                const data = await response.json();
+                
+                if (response.ok)
+                    setShowIdk(data['show_idk']);
+            } catch(error) {
+                console.log(error);
+            }
+        };
+
+        const getIsRush = async () => {
+            try {
+                const response = await fetch(`${process.env.REACT_APP_API_URL}/poll/get_rush/`);
+                const data = await response.json();
+                
+                if (response.ok)
+                    setIsRush(data['is_rush']);
+            } catch(error) {
+                console.log(error);
+            }
+        };
+
         authenticate();
-
-
-    });
+        getShowIdk();
+        getIsRush();
+    }, []);
 
     const client = useRef(null);
     useEffect(() => {
@@ -81,6 +108,24 @@ export function Standards() {
         setSessionInput("");
     }
 
+    const UpdateShowIdk = async () => {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/poll/update_idk/`, {
+            method: 'POST'
+        });
+        
+        if (response.ok)
+            setShowIdk(!showIdk);
+    }
+
+    const UpdateIsRush = async () => {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/poll/update_rush/`, {
+            method: 'POST'
+        });
+
+        if (response.ok)
+            setIsRush(!isRush);
+    }
+
     const renderContent = () => {
         switch(content) {
             case "Active":
@@ -88,6 +133,8 @@ export function Standards() {
                     <div style={{display: 'flex'}}>
                         <StandardsPoll 
                             sessionID={sessionID}
+                            showIdk={showIdk}
+                            isRush={isRush}
                          />
                     </div>
                 );
@@ -103,6 +150,36 @@ export function Standards() {
                             onChange={(event) => setSessionInput(event.target.value)}
                         />
                         <br />
+                        <table style={{margin: 'auto', alignItems: 'center', height: 'auto', justifyContent: 'center', textAlign: 'center'}}>
+                            <tr>
+                                <td>
+                                    <h3 className="red" style={{textDecorationLine: 'none'}}>
+                                        Rush Voting:
+                                    </h3>
+                                </td>
+                                <td>
+                                    <ToggleSlider
+                                        active={isRush}
+                                        barBackgroundColorActive='#FC3'
+                                        onToggle={() => UpdateIsRush()}
+                                    />
+                                </td>
+                            </tr>
+                            {!isRush && <tr>
+                                <td>
+                                    <h3 className="red" style={{textDecorationLine: 'none'}}>
+                                        Show I Don't Know Button:
+                                    </h3>
+                                </td>
+                                <td>
+                                    <ToggleSlider
+                                        active={showIdk}
+                                        barBackgroundColorActive='#FC3'
+                                        onToggle={() => UpdateShowIdk()}
+                                    />
+                                </td>
+                            </tr> }
+                        </table>
                         <br />
                         <Button
                             label="Begin Session"

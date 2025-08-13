@@ -2,8 +2,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from .models import Poll
-from .serializers import PollSerializer
+from .models import Poll, GlobalVariables
+from .serializers import PollSerializer, GlobalVariablesSerializer
 from django.db import transaction
 from django.db.utils import IntegrityError
 
@@ -12,8 +12,6 @@ def vote(request):
     vote = request.data['vote']
     rushee_name = request.data['rushee_name']
     voter_email = request.data['email']
-
-    print(f"vote: {vote}, rushee_name: {rushee_name}, voter_email: {voter_email}")
 
     try:
         with transaction.atomic():
@@ -63,7 +61,8 @@ def get_percentage_breakdown(request):
 
     return Response({"yes": (f"{yes_percentage*100:.2f}", yes_votes), 
                      "no": (f"{no_percentage*100:.2f}", no_votes), 
-                     "idk": (f"{idk_percentage*100:.2f}", idk_votes)}, status=status.HTTP_200_OK)
+                     "idk": (f"{idk_percentage*100:.2f}", idk_votes),
+                     "total_votes": total_votes }, status=status.HTTP_200_OK)
 
 # @api_view(['GET'])
 # def get_voters(request):
@@ -89,6 +88,44 @@ def delete_poll(request):
     for vote in votes:
         vote.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
+
+@api_view(['POST'])
+def toggle_idk(request):
+    show_obj = GlobalVariables.objects.get(variable='show_idk')
+
+    show_obj.value = not show_obj.value
+
+    serializer = GlobalVariablesSerializer(show_obj, data={'value': show_obj.value}, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def get_idk(request):
+    show_obj = GlobalVariables.objects.get(id=1)
+
+    return Response({'show_idk': show_obj.value}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def toggle_is_rush(request):
+    is_rush_obj = GlobalVariables.objects.get(variable='is_rush_voting')
+
+    is_rush_obj.value = not is_rush_obj.value
+
+    serializer = GlobalVariablesSerializer(is_rush_obj, data={'value': is_rush_obj.value}, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def get_is_rush(request):
+    is_rush_obj = GlobalVariables.objects.get(variable='is_rush_voting')
+
+    return Response({'is_rush': is_rush_obj.value}, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def test_redis(request):

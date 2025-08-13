@@ -9,3 +9,7 @@ class Poll(models.Model):
     class Meta:
         verbose_name = 'poll'
         unique_together = ('rushee_name', 'voter')
+
+class GlobalVariables(models.Model):
+    variable = models.CharField(blank=False, null=False, verbose_name='variable', unique=True)
+    value = models.BooleanField(default=False, verbose_name='value')

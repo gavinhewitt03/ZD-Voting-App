@@ -11,12 +11,26 @@ export function Poll() {
     const [content, setContent] = useState("NoSession");
     const [isLoading, setIsLoading] = useState(false);
     const [rusheeName, setRusheeName] = useState("");
+    const [showIdk, setShowIdk] = useState(false);
 
     const [sessionID, setSessionID] = useState("");
     const [sessionInput, setSessionInput] = useState("");
 
     const user_email = useRef(null);
     const user_full_name = useRef(null);
+
+    const getShowIdk = async () => {
+        try {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/poll/get_idk/`);
+            const data = await response.json();
+            
+            if (response.ok)
+                setShowIdk(data['show_idk']);
+        } catch(error) {
+            console.log(error);
+        }
+    };
+
     useEffect(() => {
         const authenticate = async () => {
             try {
@@ -46,6 +60,7 @@ export function Poll() {
         };
 
         authenticate();
+        getShowIdk();
     }, []);
 
     useEffect(() => {
@@ -72,6 +87,7 @@ export function Poll() {
         };
 
         hasVoted();
+        getShowIdk();
     }, [sessionID, rusheeName]);
 
     const client = useRef(null);
@@ -107,6 +123,8 @@ export function Poll() {
         client.current.onerror = (error) => {
             console.error("WebSocket error: ", error);
         }
+
+        getShowIdk();
 
         return () => {
             if (client.current) {
@@ -187,12 +205,12 @@ export function Poll() {
                                 className="red"
                             />
                             &emsp;
-                            {/* <Button
+                            { showIdk && <Button
                                 label="I Don't Know"
                                 clickFunc={ () => SendVote('idk') }
                                 className="red"
-                            />
-                            &emsp; */}
+                            /> }
+                            &emsp;
                             <Button
                                 label="No"
                                 clickFunc={ () => SendVote('no') }

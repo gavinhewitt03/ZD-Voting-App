@@ -1,7 +1,12 @@
 from rest_framework import serializers
-from .models import Poll
+from .models import Poll, GlobalVariables
 
 class PollSerializer(serializers.ModelSerializer):
     class Meta:
         model = Poll
         fields = ('rushee_name', 'voter', 'vote')
+
+class GlobalVariablesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GlobalVariables
+        fields = ('value', 'variable')

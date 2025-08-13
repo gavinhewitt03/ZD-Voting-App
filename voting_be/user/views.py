@@ -144,3 +144,14 @@ def clear_logged_in(request):
     LoggedInUsers.objects.all().delete()
 
     return Response(status=status.HTTP_204_NO_CONTENT)
+
+@api_view(['POST'])
+def change_password(request):
+    email = request.data['email']
+    password = request.data['password']
+
+    user = get_object_or_404(CustomUser, email=email)
+    user.set_password(password)
+    user.save()
+
+    return Response(status=status.HTTP_200_OK)

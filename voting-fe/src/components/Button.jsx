@@ -14,7 +14,7 @@ export function Button({ label, clickFunc, className, type, disabled }) {
             type={type}
             disabled={disabled}
         >
-            {label}
+            <p className="button">{label}</p>
         </button>
     );
 }

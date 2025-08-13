@@ -3,11 +3,12 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Button } from "./Button";
 import { w3cwebsocket as W3CWebSocket } from 'websocket'
 
-export function StandardsPoll({ sessionID }) {
+export function StandardsPoll({ sessionID, showIdk, isRush }) {
     const [percentage, setPercentage] = useState(0.0);
     const [yesData, setYesData] = useState(null);
     const [noData, setNoData] = useState(null);
     const [idkData, setIdkData] = useState(null);
+    const [totalVotes, setTotalVotes] = useState(null);
     const [rusheeName, setRusheeName] = useState("");
     const [activePoll, setActivePoll] = useState(false);
     const [remainingVoters, setRemainingVoters] = useState([]);
@@ -114,6 +115,7 @@ export function StandardsPoll({ sessionID }) {
         setYesData(breakdownData['yes']);
         setNoData(breakdownData['no']);
         setIdkData(breakdownData['idk']);
+        setTotalVotes(breakdownData['total_votes']);
 
         const deleteResponse = await fetch(`${process.env.REACT_APP_API_URL}/poll/delete/`, {
             method: 'DELETE',
@@ -168,7 +170,7 @@ export function StandardsPoll({ sessionID }) {
         return (
             <div className="poll-section">
                 <h3 className="red" style={{textDecorationLine: 'none'}}>
-                    Insert PNM Name Here:
+                    Insert {isRush ? 'Rushee' : 'PNM' } Name Here:
                 </h3>
                 <input 
                     type="text" 
@@ -193,11 +195,17 @@ export function StandardsPoll({ sessionID }) {
             </h3>
             <br />
             <p className="red">
-                Yes: {yesData[0]}%, {yesData[1]} votes
+                Yes: {yesData[0]}%, {yesData[1]} {yesData[1] === 1 ? 'vote' : 'votes'}
                 <br />
-                No: {noData[0]}%, {noData[1]} votes
-                {/* <br />
-                I Don't Know: {idkData[0]}%, {idkData[1]} votes */}
+                No: {noData[0]}%, {noData[1]} {noData[1] === 1 ? 'vote' : 'votes'}
+                { showIdk && <br /> }
+            </p>
+            { showIdk && <p className="red">
+                I Don't Know: {idkData[0]}%, {idkData[1]} {idkData[1] === 1 ? 'vote' : 'votes'}
+            </p> }
+            <br />
+            <p className="red">
+                Total Votes: {totalVotes} {totalVotes === 1 ? 'vote' : 'votes'}
             </p>
             <br />
             <Button

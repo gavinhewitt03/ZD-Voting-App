@@ -13,5 +13,6 @@ urlpatterns = [
     path('get_user/', UserInfoAPIView.as_view(), name='get_user'),
     path('update_is_active/', update_is_active, name='update_is_active'),
     path('force/', force_logout, name='force_logout'),
-    path('clear/', clear_logged_in, name='clear_logged_in')
+    path('clear/', clear_logged_in, name='clear_logged_in'),
+    path('change_password/', change_password, name='change_password')
 ]

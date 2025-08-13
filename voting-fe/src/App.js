@@ -6,6 +6,7 @@ import { Regent } from './pages/Regent'
 import { Standards } from './pages/Standards'
 import { Poll } from './pages/Poll'
 import { CreateUser } from './pages/CreateUser'
+import { ChangePassword } from './pages/ChangePassword';
 import React, { useState, useEffect } from 'react'
 
 function App() {
@@ -48,6 +49,7 @@ function App() {
             } />
             <Route path="/home" element = { content } />
             <Route path="/createuser" element={ <CreateUser /> } />
+            <Route path="/home/changepassword" element={ <ChangePassword /> } />
         </Routes>
      );
 }

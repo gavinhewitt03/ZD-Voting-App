@@ -2,7 +2,7 @@ import { Header } from '../components/Header'
 import { ToggleSlider } from 'react-toggle-slider'
 import { Button } from '../components/Button'
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 async function UpdateIsActive(user) {
     const response = await fetch(`${process.env.REACT_APP_API_URL}/user/update_is_active/`, {
@@ -26,7 +26,7 @@ export function User() {
             try {
                 setIsLoading(true);
     
-                const response = await fetch(`${process.env.REACT_APP_API_URL}/user/get_users`);
+                const response = await fetch(`${process.env.REACT_APP_API_URL}/user/get_users/`);
     
                 const data = await response.json();
 
@@ -48,7 +48,7 @@ export function User() {
                             'Authorization': `Bearer ${token}`
                         }
                     }
-                    const response = await fetch(`${process.env.REACT_APP_API_URL}/user/get_user`, config);
+                    const response = await fetch(`${process.env.REACT_APP_API_URL}/user/get_user/`, config);
                     
                     const data = await response.json();
                     if (response.ok) {
@@ -157,6 +157,20 @@ export function User() {
                                                 clickFunc={() => forceLogout(`${user.first_name} ${user.last_name}`)}
                                                 className="yellow"
                                             />
+                                        </td>
+                                        <td style={{ paddingLeft: '2px', paddingRight: '2px' }}>
+                                            <Link to={{
+                                                pathname: "changepassword",
+                                                search: `email=${user.email}`
+                                            }}
+                                            >
+                                                <Button
+                                                    label="Change Password"
+                                                    clickFunc={() => {}}
+                                                    className="yellow"
+                                                />
+                                            </Link>
+                                            
                                         </td>
                                     </tr>
                                 ))
