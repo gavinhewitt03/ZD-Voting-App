@@ -5,11 +5,13 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 async function UpdateIsActive(user) {
+    const token = localStorage.getItem('accessToken');
     const response = await fetch(`${process.env.REACT_APP_API_URL}/user/update_is_active/`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(user)
     });
@@ -20,7 +22,8 @@ export function User() {
     const [isLoading, setIsLoading] = useState(false);
     const [loggedIn, setLoggedIn] = useState(false);
     const navigate = useNavigate();
-        
+    
+    const token = localStorage.getItem('accessToken');
     useEffect(() => {
         const fetchUserList = async () => {
             try {
@@ -40,7 +43,6 @@ export function User() {
 
         const authenticate = async () => {
             try {
-                const token = localStorage.getItem('accessToken');
 
                 if (token) {
                     const config = {
@@ -68,16 +70,31 @@ export function User() {
 
     const clearLogIn = async () => {
         await fetch(`${process.env.REACT_APP_API_URL}/user/clear/`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
         });
     };
+
+    const deleteGrads = async () => {
+        if (window.confirm("This will delete all users who have graduated today or earlier. Do you want to do this?")) {
+            await fetch(`${process.env.REACT_APP_API_URL}/user/delete_grads/`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+        }
+    }
 
     const forceLogout = async (fullName) => {
         await fetch(`${process.env.REACT_APP_API_URL}/user/force/`, {
             method: 'DELETE',
             headers: {
                 'Accept': 'application/json',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
                 'full_name': fullName
@@ -98,23 +115,34 @@ export function User() {
                             clickFunc={() => clearLogIn()}
                             className="yellow"
                         />
+                        &emsp;
+                        <Button
+                            label="Delete Graduated"
+                            clickFunc={() => deleteGrads()}
+                            className="yellow"
+                        />
                     </div>
                     <div style={{ marginTop: '8vh'}}>
                         <table className="user-table">
                             <tr>
-                                <td  style={{ width: '40%' }}>
+                                <td  style={{ width: '30%' }}>
                                     <p className='user-table-text'>
                                         Email
                                     </p>
                                 </td>
-                                <td style={{ width: '20%' }}>
+                                <td style={{ width: '15%' }}>
                                     <p className='user-table-text'>
                                         First Name
                                     </p>
                                 </td>
-                                <td style={{ width: '20%' }}>
+                                <td style={{ width: '15%' }}>
                                     <p className='user-table-text'>
                                         Last Name
+                                    </p>
+                                </td>
+                                <td style={{ width: '10%'}}>
+                                    <p className='user-table-text'>
+                                    Grad Year
                                     </p>
                                 </td>
                                 <td style={{ width: '10%' }}>
@@ -122,6 +150,7 @@ export function User() {
                                     Active
                                     </p>
                                 </td>
+                                <td style={{ width: '10%' }}></td>
                                 <td style={{ width: '10%' }}></td>
                             </tr>
                             {
@@ -140,6 +169,11 @@ export function User() {
                                         <td className='user-table-text'>
                                             <p className='user-table-text'>
                                                 {user.last_name}
+                                            </p>
+                                        </td>
+                                        <td className='user-table-text'>
+                                            <p className='user-table-text'>
+                                                {user.grad_year}
                                             </p>
                                         </td>
                                         <td>
@@ -166,6 +200,20 @@ export function User() {
                                             >
                                                 <Button
                                                     label="Change Password"
+                                                    clickFunc={() => {}}
+                                                    className="yellow"
+                                                />
+                                            </Link>
+                                            
+                                        </td>
+                                        <td style={{ paddingLeft: '2px', paddingRight: '2px' }}>
+                                            <Link to={{
+                                                pathname: "updateuser",
+                                                search: `email=${user.email}`
+                                            }}
+                                            >
+                                                <Button
+                                                    label="Edit User"
                                                     clickFunc={() => {}}
                                                     className="yellow"
                                                 />

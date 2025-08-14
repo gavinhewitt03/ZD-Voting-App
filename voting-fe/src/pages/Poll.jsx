@@ -75,7 +75,6 @@ export function Poll() {
             const response = await fetch(`${process.env.REACT_APP_API_URL}/poll/voted/?${queryParams}`)
 
             const has_voted = (await response.json())['has_voted'];
-            console.log(has_voted);
 
             if (!has_voted) {
                 setIsLoading(false);
@@ -106,7 +105,6 @@ export function Poll() {
 
         client.current.onmessage = (message) => {
             let messageJson = JSON.parse(message['data']);
-            console.log(messageJson);
 
             setRusheeName((name) => {
                 if (messageJson['name'] === 'standards' || messageJson['name'] === 'history')

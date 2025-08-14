@@ -11,13 +11,15 @@ export function ChangePassword() {
 
     const [password, setPassword] = useState("");
 
+    const token = localStorage.getItem('accessToken');
     const changePassword = async () => {
         try {
             const response = await fetch(`${process.env.REACT_APP_API_URL}/user/change_password/`, {
                 method: "POST",
                 headers: {
                     'Accept': 'application/json',
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({
                     'email': email,
@@ -41,7 +43,7 @@ export function ChangePassword() {
                     Update password for {email}
                 </h3>
                 <input 
-                    type="text" 
+                    type="password" 
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
                 />

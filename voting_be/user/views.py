@@ -9,6 +9,34 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.exceptions import ValidationError
 from .serializers import *
 from .models import CustomUser
+from datetime import date
+import requests
+import os
+from pathlib import Path
+from dotenv import load_dotenv
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+environment = os.getenv("DJANGO_ENV", "development")
+
+if environment == 'development':
+    load_dotenv(dotenv_path=os.path.join(BASE_DIR, '.env.development'))
+
+def verify_admin(request):
+    try:
+        token = request.headers['Authorization']
+    except KeyError as e:
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+    
+    response = requests.get(f'{os.getenv("API_URL")}/user/get_user/', headers={
+        'Authorization': token
+    })
+    groups = response.json()['groups']
+
+    if 'Administrator' not in groups:
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+    
+    return Response(status=status.HTTP_202_ACCEPTED)
 
 class UserRegistrationAPIView(GenericAPIView):
     permission_classes = (AllowAny, )
@@ -102,6 +130,10 @@ def get_all_users(request):
 
 @api_view(['POST'])
 def update_is_active(request):
+    verification = verify_admin(request)
+    if verification.status_code == 401:
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+    
     email = request.data['email']
     user = CustomUser.objects.get(email=email)
 
@@ -132,6 +164,10 @@ def get_full_name(request):
 
 @api_view(['DELETE'])
 def force_logout(request):
+    verification = verify_admin(request)
+    if verification.status_code == 401:
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+
     full_name = request.data['full_name']
      
     user = get_object_or_404(LoggedInUsers, full_name=full_name)
@@ -141,12 +177,20 @@ def force_logout(request):
 
 @api_view(['DELETE'])
 def clear_logged_in(request):
+    verification = verify_admin(request)
+    if verification.status_code == 401:
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+    
     LoggedInUsers.objects.all().delete()
 
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 @api_view(['POST'])
 def change_password(request):
+    verification = verify_admin(request)
+    if verification.status_code == 401:
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+    
     email = request.data['email']
     password = request.data['password']
 
@@ -155,3 +199,55 @@ def change_password(request):
     user.save()
 
     return Response(status=status.HTTP_200_OK)
+
+@api_view(['DELETE'])
+def delete_grads(request):
+    verification = verify_admin(request)
+    if verification.status_code == 401:
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+    
+    grads = CustomUser.objects.filter(grad_year__lte=date.today())
+    grads = grads.all().delete()
+
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+@api_view(['POST'])
+def update_user(request):
+    verification = verify_admin(request)
+    if verification.status_code == 401:
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+    email = request.data['original_email']
+    user = CustomUser.objects.get(email=email)
+
+    serializer = UserSerializer(instance=user, data=request.data, partial=True)
+
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def get_user(request):
+    verification = verify_admin(request)
+    if verification.status_code == 401:
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+    
+    email = request.data['email']
+    user = get_object_or_404(CustomUser, email=email)
+    serializer = UserSerializer(user)
+
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['DELETE'])
+def delete_user(request):
+    verification = verify_admin(request)
+    if verification.status_code == 401:
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+    
+    email = request.data['email']
+    user = get_object_or_404(CustomUser, email=email)
+
+    user.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)

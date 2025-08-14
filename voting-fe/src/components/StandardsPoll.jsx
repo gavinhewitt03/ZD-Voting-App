@@ -48,6 +48,7 @@ export function StandardsPoll({ sessionID, showIdk, isRush }) {
         client.current.onmessage = (message) => {
             let messageJson = JSON.parse(message['data']);
             
+            console.log(messageJson['message']);
             if (messageJson['message'] === 'voted' || messageJson['message'] === 'logged out') {
                 let removeName = messageJson['name'];
                 setRemainingVoters((voters) => {

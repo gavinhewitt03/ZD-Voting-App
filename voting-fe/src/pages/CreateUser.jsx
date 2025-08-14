@@ -10,7 +10,8 @@ export function CreateUser() {
        'last_name': '',
        'email': '',
        'password1': '',
-       'password2': ''
+       'password2': '',
+       'grad_year': ''
     });
     const [errorMessage, setErrorMessage] = useState(null);
     const navigate = useNavigate();
@@ -46,9 +47,10 @@ export function CreateUser() {
                 body: JSON.stringify({
                     'first_name': formData['first_name'][0],
                     'last_name': formData['last_name'][0],
-                    'email': formData['email'][0],
+                    'email': formData['email'][0] ? formData['email'][0].toLowerCase() : '',
                     'password1': formData['password1'][0],
-                    'password2': formData['password2'][0]
+                    'password2': formData['password2'][0],
+                    'grad_year': formData['grad_year'][0] ? formData['grad_year'][0] : ''
                 })
             });
 
@@ -61,7 +63,7 @@ export function CreateUser() {
             if (response.ok)
                 navigate('/');
         } catch (error) {
-            setErrorMessage(error);
+            setErrorMessage(toProperCase(Object.values(error)[0][0]));
         } finally {
             setIsLoading(false);
         }
@@ -94,6 +96,14 @@ export function CreateUser() {
                         stateVar={formData.last_name}
                         stateFunc={handleChange}
                         name="last_name"
+                    />
+                    <br />
+                    <InputField
+                        text="Graduation Year: (select the last day of the month)"
+                        stateVar={formData.grad_year}
+                        stateFunc={handleChange}
+                        name="grad_year"
+                        type="date"
                     />
                     <br />
                     <InputField

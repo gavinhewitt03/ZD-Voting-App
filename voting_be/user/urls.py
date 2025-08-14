@@ -14,5 +14,9 @@ urlpatterns = [
     path('update_is_active/', update_is_active, name='update_is_active'),
     path('force/', force_logout, name='force_logout'),
     path('clear/', clear_logged_in, name='clear_logged_in'),
-    path('change_password/', change_password, name='change_password')
+    path('change_password/', change_password, name='change_password'),
+    path('delete_grads/', delete_grads, name='delete_grads'),
+    path('update/', update_user, name='update_user'),
+    path('get_user_info/', get_user, name='get_user_info'),
+    path('delete/', delete_user, name='delete_user')
 ]

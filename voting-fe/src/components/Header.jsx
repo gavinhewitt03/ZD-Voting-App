@@ -24,7 +24,7 @@ export function Header({ setLoggedIn, displayLogout, user_full_name, sendLogoutM
                 });
 
                 
-    
+                sendLogoutMessage();
                 localStorage.removeItem('accessToken');
                 localStorage.removeItem('refreshToken');
                 setLoggedIn(false);
